@@ -1,5 +1,7 @@
 /*
- * Copyright 2023 Rémi Bernon for CodeWeavers
+ * Runtime Classes for windows.system.profile.hardwareid.dll
+ *
+ * Copyright (C) 2024 Onni Kukkonen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,20 +20,4 @@
 
 #pragma makedep register
 
-#ifdef __WIDL__
-#pragma winrt ns_prefix
-#endif
-
-import "inspectable.idl";
-import "asyncinfo.idl";
-import "eventtoken.idl";
-import "windowscontracts.idl";
-import "windows.foundation.idl";
-import "windows.globalization.idl";
-import "windows.storage.streams.idl";
-
-#define DO_NO_IMPORTS
-#define _TWINAPI_APPCORE
-#include "windows.security.exchangeactivesyncprovisioning.idl"
 #include "windows.system.profile.idl"
-#include "windows.system.userprofile.idl"

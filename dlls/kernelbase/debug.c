@@ -789,6 +789,15 @@ HRESULT WINAPI /* DECLSPEC_HOTPATCH */ WerRegisterFile( const WCHAR *file, WER_R
     return E_NOTIMPL;
 }
 
+/***********************************************************************
+ *         WerRegisterCustomMetadata   (kernelbase.@)
+ */
+HRESULT WINAPI /* DECLSPEC_HOTPATCH */ WerRegisterCustomMetadata( const WCHAR *key, const WCHAR *value)
+{
+    FIXME( "(%s, %s) stub\n", debugstr_w(key), debugstr_w(value));
+    return E_NOTIMPL;
+}
+
 
 /***********************************************************************
  *         WerRegisterMemoryBlock   (kernelbase.@)

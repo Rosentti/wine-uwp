@@ -1,0 +1,6 @@
+MODULE  = windows.system.profile.hardwareid.dll
+IMPORTS = combase oleaut32
+
+SOURCES = \
+	classes.idl \
+	main.c

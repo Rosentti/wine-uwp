@@ -492,6 +492,14 @@ FARPROC WINAPI DECLSPEC_HOTPATCH GetProcAddress( HMODULE module, LPCSTR function
 
 #endif /* __x86_64__ */
 
+/***********************************************************************
+ *	ResolveDelayLoadsFromDll   (kernelbase.@)
+ */
+NTSTATUS WINAPI ResolveDelayLoadsFromDll(PVOID parentBase, LPCSTR name, ULONG reserved)
+{
+    FIXME( "stub, parentBase %p, name %s, reserved %#lx.\n", parentBase, debugstr_a(name), reserved );
+    return S_OK;
+}
 
 /***********************************************************************
  *	IsApiSetImplemented   (kernelbase.@)

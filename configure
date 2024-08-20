@@ -22759,6 +22759,7 @@ wine_fn_config_makefile dlls/windows.devices.bluetooth enable_windows_devices_bl
 wine_fn_config_makefile dlls/windows.devices.bluetooth/tests enable_tests
 wine_fn_config_makefile dlls/windows.devices.enumeration enable_windows_devices_enumeration
 wine_fn_config_makefile dlls/windows.devices.enumeration/tests enable_tests
+wine_fn_config_makefile dlls/windows.devices.enumeration.pnp enable_windows_devices_enumeration_pnp
 wine_fn_config_makefile dlls/windows.devices.usb enable_windows_devices_usb
 wine_fn_config_makefile dlls/windows.devices.usb/tests enable_tests
 wine_fn_config_makefile dlls/windows.gaming.input enable_windows_gaming_input
@@ -22788,6 +22789,7 @@ wine_fn_config_makefile dlls/windows.storage.applicationdata enable_windows_stor
 wine_fn_config_makefile dlls/windows.storage.applicationdata/tests enable_tests
 wine_fn_config_makefile dlls/windows.system.profile.systemmanufacturers enable_windows_system_profile_systemmanufacturers
 wine_fn_config_makefile dlls/windows.system.profile.systemmanufacturers/tests enable_tests
+wine_fn_config_makefile dlls/windows.system.profile.hardwareid enable_windows_system_profile_hardwareid
 wine_fn_config_makefile dlls/windows.ui enable_windows_ui
 wine_fn_config_makefile dlls/windows.ui/tests enable_tests
 wine_fn_config_makefile dlls/windows.web enable_windows_web

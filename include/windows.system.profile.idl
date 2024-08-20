@@ -36,8 +36,13 @@ namespace Windows.System.Profile {
     interface IAnalyticsInfoStatics2;
     interface IAnalyticsVersionInfo;
     interface IAnalyticsVersionInfo2;
+    interface IHardwareIdentificationStatics;
+    interface IHardwareToken;
+
     runtimeclass AnalyticsVersionInfo;
     runtimeclass AnalyticsInfo;
+    runtimeclass HardwareIdentification;
+    runtimeclass HardwareToken;
 
     [
         contract(Windows.Foundation.UniversalApiContract, 1.0),
@@ -63,6 +68,28 @@ namespace Windows.System.Profile {
 
     [
         contract(Windows.Foundation.UniversalApiContract, 1.0),
+        exclusiveto(Windows.System.Profile.HardwareIdentification),
+        uuid(971260e0-f170-4a42-bd55-a900b212dae2)
+    ]
+    interface IHardwareIdentificationStatics : IInspectable
+    {
+        HRESULT GetPackageSpecificToken([in] Windows.Storage.Streams.IBuffer* nonce, [out, retval] Windows.System.Profile.HardwareToken** packageSpecificHardwareToken);
+    }
+
+    [
+        contract(Windows.Foundation.UniversalApiContract, 1.0),
+        exclusiveto(Windows.System.Profile.HardwareToken),
+        uuid(28f6d4c0-fb12-40a4-8167-7f4e03d2724c)
+    ]
+    interface IHardwareToken : IInspectable
+    {
+        [propget] HRESULT Id([out, retval] Windows.Storage.Streams.IBuffer** value);
+        [propget] HRESULT Signature([out, retval] Windows.Storage.Streams.IBuffer** value);
+        [propget] HRESULT Certificate([out, retval] Windows.Storage.Streams.IBuffer** value);
+    }
+
+    [
+        contract(Windows.Foundation.UniversalApiContract, 1.0),
         marshaling_behavior(agile),
         threading(both)
     ]
@@ -83,4 +110,25 @@ namespace Windows.System.Profile {
     {
     }
 
+
+    [
+        contract(Windows.Foundation.UniversalApiContract, 1.0),
+        marshaling_behavior(standard),  
+        static(Windows.System.Profile.IHardwareIdentificationStatics, Windows.Foundation.UniversalApiContract, 1.0),
+        threading(both)
+    ]
+    runtimeclass HardwareIdentification
+    {
+        [default] interface Windows.System.Profile.IHardwareIdentificationStatics;
+    }
+
+    [
+        contract(Windows.Foundation.UniversalApiContract, 1.0),
+        marshaling_behavior(agile),
+        threading(both)
+    ]
+    runtimeclass HardwareToken
+    {
+        [default] interface Windows.System.Profile.IHardwareToken;
+    }
 }
