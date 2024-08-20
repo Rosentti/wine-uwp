@@ -102,22 +102,35 @@ static HRESULT WINAPI pnpstatic_GetTrustLevel( IPnpObjectStatics *iface, TrustLe
     return E_NOTIMPL;
 }
 
+static HRESULT WINAPI async_stub( IUnknown *invoker, IUnknown *param, PROPVARIANT *result )
+{
+    return E_NOTIMPL;
+    // struct motor *impl = impl_from_IForceFeedbackMotor( (IForceFeedbackMotor *)invoker );
+    // HRESULT hr;
+
+    // hr = IDirectInputDevice8_SendForceFeedbackCommand( impl->device, DISFFC_SETACTUATORSOFF );
+    // result->vt = VT_BOOL;
+    // result->boolVal = SUCCEEDED(hr);
+
+    // return hr;
+}
+
 static HRESULT WINAPI pnpstatic_CreateFromIdAsync( IPnpObjectStatics *iface, PnpObjectType type, HSTRING id, IIterable_HSTRING* requestedProperties, IAsyncOperation_PnpObject** asyncOp)
 {
     FIXME( "iface %p, type %04x, id %s, requestedProperties %p, asyncOp %p stub!\n", iface, type, debugstr_hstring(id), requestedProperties, asyncOp );
-    return E_NOTIMPL;
+    return async_operation_pnpobject_create( (IUnknown *)iface, NULL, async_stub, asyncOp );
 }
 
 static HRESULT WINAPI pnpstatic_FindAllAsync( IPnpObjectStatics *iface, PnpObjectType type, IIterable_HSTRING* requestedProperties, IAsyncOperation_PnpObjectCollection** asyncOp ) 
 {
     FIXME( "iface %p, type %04x, requestedProperties %p, asyncOp %p stub!\n", iface, type, requestedProperties, asyncOp );
-    return E_NOTIMPL;
+    return async_operation_pnpobjectcollection_create( (IUnknown *)iface, NULL, async_stub, asyncOp );
 }
 
 static HRESULT WINAPI pnpstatic_FindAllAsyncAqsFilter( IPnpObjectStatics *iface, PnpObjectType type, IIterable_HSTRING* requestedProperties, HSTRING aqsFilter, IAsyncOperation_PnpObjectCollection** asyncOp ) 
 {
     FIXME( "iface %p, type %04x, requestedProperties %p, aqsFilter %s, asyncOp %p stub!\n", iface, type, requestedProperties, debugstr_hstring(aqsFilter), asyncOp );
-    return E_NOTIMPL;
+    return async_operation_pnpobjectcollection_create( (IUnknown *)iface, NULL, async_stub, asyncOp );
 }
 
 static HRESULT WINAPI pnpstatic_CreateWatcher( IPnpObjectStatics *iface, PnpObjectType type, IIterable_HSTRING* requestedProperties, __x_ABI_CWindows_CDevices_CEnumeration_CPnp_CIPnpObjectWatcher** watcher)

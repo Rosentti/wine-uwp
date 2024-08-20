@@ -1,6 +1,6 @@
-/* WinRT Windows.Devices.Enumeration.Pnp implementation
+/* WinRT Windows.ApplicationModel.Core Implementation
  *
- * Copyright 2024 Onni Kukkonen
+ * Copyright (C) 2024 Onni Kukkonen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,8 +17,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#ifndef __WINE_WINDOWS_DEVICES_ENUMERATION_PNP_PRIVATE_H
-#define __WINE_WINDOWS_DEVICES_ENUMERATION_PNP_PRIVATE_H
+#ifndef __WINE_WINDOWS_APPLICATIONMODEL_CORE_PRIVATE_H
+#define __WINE_WINDOWS_APPLICATIONMODEL_CORE_PRIVATE_H
 
 #include <stdarg.h>
 
@@ -26,30 +26,15 @@
 #include "windef.h"
 #include "winbase.h"
 #include "winstring.h"
-#include "objbase.h"
 
 #include "activation.h"
 
 #define WIDL_using_Windows_Foundation
-#define WIDL_using_Windows_Foundation_Collections
 #include "windows.foundation.h"
-#define WIDL_using_Windows_Devices_Enumeration
-#include "windows.devices.enumeration.h"
-#define WIDL_using_Windows_Devices_Enumeration_Pnp
-#include "windows.devices.enumeration.pnp.h"
+#define WIDL_using_Windows_ApplicationModel_Core
+#include "windows.applicationmodel.core.h"
 
-#include "wine/list.h"
-
-#include "provider.h"
-
-extern IActivationFactory *activation_factory;
-
-typedef HRESULT (WINAPI *async_operation_callback)( IUnknown *invoker, IUnknown *param, PROPVARIANT *result );
-extern HRESULT async_operation_pnpobject_create( IUnknown *invoker, IUnknown *param, async_operation_callback callback,
-                                                                          IAsyncOperation_PnpObject **out );
-
-extern HRESULT async_operation_pnpobjectcollection_create( IUnknown *invoker, IUnknown *param, async_operation_callback callback,
-                                                                          IAsyncOperation_PnpObjectCollection **out );                                                              
+extern IActivationFactory *coreapplication_factory;
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \
@@ -88,7 +73,5 @@ extern HRESULT async_operation_pnpobjectcollection_create( IUnknown *invoker, IU
     }
 #define DEFINE_IINSPECTABLE( pfx, iface_type, impl_type, base_iface )                              \
     DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, iface_type##_iface, &impl->base_iface )
-#define DEFINE_IINSPECTABLE_OUTER( pfx, iface_type, impl_type, outer_iface )                       \
-    DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, iface_type##_iface, impl->outer_iface )
 
 #endif
