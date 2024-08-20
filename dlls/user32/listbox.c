@@ -1635,6 +1635,8 @@ static LRESULT LISTBOX_InsertItem( LB_DESCR *descr, INT index,
               descr->self, index, str ? debugstr_w(str) : "", get_item_height(descr, index));
     }
 
+    NtUserNotifyWinEvent( EVENT_OBJECT_CREATE, descr->self, OBJID_CLIENT, index + 1 );
+
     /* Repaint the items */
 
     LISTBOX_UpdateScroll( descr );
@@ -1733,6 +1735,8 @@ static LRESULT LISTBOX_RemoveItem( LB_DESCR *descr, INT index )
 
     /* We need to invalidate the original rect instead of the updated one. */
     LISTBOX_InvalidateItems( descr, index );
+
+    NtUserNotifyWinEvent( EVENT_OBJECT_DESTROY, descr->self, OBJID_CLIENT, index + 1 );
 
     if (descr->nb_items == 1)
     {
