@@ -58,6 +58,32 @@ static inline const char *debugstr_window_rects( const struct window_rects *rect
                              wine_dbgstr_rect( &rects->client ), wine_dbgstr_rect( &rects->visible ) );
 }
 
+/* convert a visible rect to the corresponding window rect, using the window_rects offsets */
+static inline RECT window_rect_from_visible( struct window_rects *rects, RECT visible_rect )
+{
+    RECT rect = visible_rect;
+
+    rect.left += rects->window.left - rects->visible.left;
+    rect.top += rects->window.top - rects->visible.top;
+    rect.right += rects->window.right - rects->visible.right;
+    rect.bottom += rects->window.bottom - rects->visible.bottom;
+
+    return rect;
+}
+
+/* convert a window rect to the corresponding visible rect, using the window_rects offsets */
+static inline RECT visible_rect_from_window( struct window_rects *rects, RECT window_rect )
+{
+    RECT rect = window_rect;
+
+    rect.left += rects->visible.left - rects->window.left;
+    rect.top += rects->visible.top - rects->window.top;
+    rect.right += rects->visible.right - rects->window.right;
+    rect.bottom += rects->visible.bottom - rects->window.bottom;
+
+    return rect;
+}
+
 typedef struct gdi_physdev
 {
     const struct gdi_dc_funcs *funcs;
@@ -193,7 +219,7 @@ struct gdi_dc_funcs
 };
 
 /* increment this when you change the DC function table */
-#define WINE_GDI_DRIVER_VERSION 93
+#define WINE_GDI_DRIVER_VERSION 94
 
 #define GDI_PRIORITY_NULL_DRV        0  /* null driver */
 #define GDI_PRIORITY_FONT_DRV      100  /* any font driver */
@@ -370,6 +396,8 @@ struct user_driver_funcs
     struct opengl_funcs * (*pwine_get_wgl_driver)(UINT);
     /* thread management */
     void    (*pThreadDetach)(void);
+    /* IME support */
+    BOOL    (*pSetIMECompositionWindowPos)(HWND, const POINT *);
 };
 
 W32KAPI void __wine_set_user_driver( const struct user_driver_funcs *funcs, UINT version );
