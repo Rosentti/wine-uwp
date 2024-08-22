@@ -40,16 +40,14 @@
 
 #include "wine/list.h"
 
-#include "provider.h"
-
 extern IActivationFactory *activation_factory;
 
-typedef HRESULT (WINAPI *async_operation_callback)( IUnknown *invoker, IUnknown *param, PROPVARIANT *result );
-extern HRESULT async_operation_pnpobject_create( IUnknown *invoker, IUnknown *param, async_operation_callback callback,
-                                                                          IAsyncOperation_PnpObject **out );
+typedef HRESULT (*async_action_callback)( IInspectable *invoker );
+typedef HRESULT (*async_operation_inspectable_callback)( IInspectable *invoker, IInspectable **result );
 
-extern HRESULT async_operation_pnpobjectcollection_create( IUnknown *invoker, IUnknown *param, async_operation_callback callback,
-                                                                          IAsyncOperation_PnpObjectCollection **out );                                                              
+HRESULT async_action_create( IInspectable *invoker, async_action_callback callback, IAsyncAction **out );
+HRESULT async_operation_inspectable_create( const GUID *iid, IInspectable *invoker, async_operation_inspectable_callback callback,
+                                            IAsyncOperation_IInspectable **out );                                                           
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \

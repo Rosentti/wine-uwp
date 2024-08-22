@@ -29,14 +29,21 @@
 
 #include "activation.h"
 
+#define WIDL_using_Windows_System
+#define WIDL_using_Windows_UI_Core
 #define WIDL_using_Windows_Foundation
 #define WIDL_using_Windows_Foundation_Collections
+#include "windows.ui.core.h"
+#include "windows.system.h"
 #include "windows.foundation.h"
 #define WIDL_using_Windows_ApplicationModel
+#define WIDL_using_Windows_ApplicationModel_Core
 #define WIDL_using_Windows_Storage
+#include "windows.applicationmodel.core.h"
 #include "windows.applicationmodel.h"
 
 extern IActivationFactory *package_factory;
+extern IActivationFactory *coreapplication_factory;
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \
@@ -75,5 +82,24 @@ extern IActivationFactory *package_factory;
     }
 #define DEFINE_IINSPECTABLE( pfx, iface_type, impl_type, base_iface )                              \
     DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, iface_type##_iface, &impl->base_iface )
+
+#define DECLARE_EVENT(pfx, evt)                              \
+    pfx##_add_##evt,                                         \
+    pfx##_remove_##evt
+
+#define DEFINE_EVENT_STUB(type, pfx, evt, event_args)                                                                                       \
+static HRESULT WINAPI pfx##_add_##evt( I##type *iface, ITypedEventHandler_##type##_##event_args *handler, EventRegistrationToken *token )                                  \
+{                                                                                                                                           \
+    FIXME( "iface %p, handler %p, token %p stub!\n", iface, handler, token );                                                                                \
+    return S_OK;                                                                                                                            \
+}                                                                                                                                           \
+                                                                                                                                            \
+static HRESULT WINAPI pfx##_remove_##evt( I##type *iface, EventRegistrationToken cookie)                                                    \
+{                                                                                                                                           \
+    FIXME( "iface %p token %#I64x stub!\n", iface, cookie.value );                                                                          \
+    return E_NOTIMPL;                                                                                                                       \
+}
+
+#define IPropertySet __x_ABI_CWindows_CFoundation_CCollections_CIPropertySet
 
 #endif

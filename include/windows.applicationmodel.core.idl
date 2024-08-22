@@ -379,7 +379,6 @@ namespace Windows.ApplicationModel.Core {
         [contract(Windows.Foundation.UniversalApiContract, 11.0)] interface Windows.ApplicationModel.Core.IAppListEntry4;
     }
 
-#ifndef _WINDOWS_APPLICATIONMODEL
     [
         contract(Windows.Foundation.UniversalApiContract, 1.0),
         marshaling_behavior(agile),
@@ -396,7 +395,6 @@ namespace Windows.ApplicationModel.Core {
     runtimeclass CoreApplication
     {
     }
-#endif
 
     [
         contract(Windows.Foundation.UniversalApiContract, 1.0),

@@ -1,7 +1,0 @@
-MODULE  = windows.applicationmodel.core.dll
-IMPORTS = combase kernelbase
-
-SOURCES = \
-	coreapplication.c \
-	classes.idl \
-	main.c 

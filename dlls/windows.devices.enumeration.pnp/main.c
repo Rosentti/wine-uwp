@@ -102,35 +102,174 @@ static HRESULT WINAPI pnpstatic_GetTrustLevel( IPnpObjectStatics *iface, TrustLe
     return E_NOTIMPL;
 }
 
-static HRESULT WINAPI async_stub( IUnknown *invoker, IUnknown *param, PROPVARIANT *result )
+struct pnpobj_impl {
+    PnpObjectType type;
+    HSTRING id;
+    IPnpObject IPnpObject_iface;
+    LONG ref;
+};
+
+static inline struct pnpobj_impl *impl_from_IPnpObject( IPnpObject *iface )
+{
+    return CONTAINING_RECORD( iface, struct pnpobj_impl, IPnpObject_iface );
+}
+
+static HRESULT WINAPI pnpobj_QueryInterface( IPnpObject *iface, REFIID iid, void **out )
+{
+    struct pnpobj_impl *impl = impl_from_IPnpObject( iface );
+
+    TRACE( "iface %p, iid %s, out %p.\n", iface, debugstr_guid( iid ), out );
+
+    if (IsEqualGUID( iid, &IID_IUnknown ) ||
+        IsEqualGUID( iid, &IID_IInspectable ) ||
+        IsEqualGUID( iid, &IID_IAgileObject ) ||
+        IsEqualGUID( iid, &IID_IPnpObject ))
+    {
+        *out = &impl->IPnpObject_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    }
+
+    if (IsEqualGUID( iid, &IID_IPnpObject ))
+    {
+        *out = &impl->IPnpObject_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    }
+
+    FIXME( "%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid( iid ) );
+    *out = NULL;
+    return E_NOINTERFACE;
+}
+
+static ULONG WINAPI pnpobj_AddRef( IPnpObject *iface )
+{
+    struct pnpobj_impl *impl = impl_from_IPnpObject( iface );
+    ULONG ref = InterlockedIncrement( &impl->ref );
+    TRACE( "iface %p increasing refcount to %lu.\n", iface, ref );
+    return ref;
+}
+
+static ULONG WINAPI pnpobj_Release( IPnpObject *iface )
+{
+    struct pnpobj_impl *impl = impl_from_IPnpObject( iface );
+    ULONG ref = InterlockedDecrement( &impl->ref );
+
+    TRACE( "iface %p decreasing refcount to %lu.\n", iface, ref );
+
+    if (!ref) free( impl );
+    return ref;
+}
+
+static HRESULT WINAPI pnpobj_GetIids( IPnpObject *iface, ULONG *iid_count, IID **iids )
+{
+    FIXME( "iface %p, iid_count %p, iids %p stub!\n", iface, iid_count, iids );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI pnpobj_GetRuntimeClassName( IPnpObject *iface, HSTRING *class_name )
+{
+    FIXME( "iface %p, class_name %p stub!\n", iface, class_name );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI pnpobj_GetTrustLevel( IPnpObject *iface, TrustLevel *trust_level )
+{
+    FIXME( "iface %p, trust_level %p stub!\n", iface, trust_level );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI pnpobj_get_Type( IPnpObject *iface, PnpObjectType* value) 
+{
+    struct pnpobj_impl *impl = impl_from_IPnpObject( iface );
+    *value = impl->type;
+    return S_OK;
+}
+
+static HRESULT WINAPI pnpobj_get_Id( IPnpObject *iface, HSTRING* value) 
+{
+    struct pnpobj_impl *impl = impl_from_IPnpObject( iface );
+    *value = impl->id;
+    return S_OK;
+}
+
+static HRESULT WINAPI pnpobj_get_Properties( IPnpObject *iface, IMapView_HSTRING_IInspectable** value) 
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI pnpobj_Update( IPnpObject *iface, __x_ABI_CWindows_CDevices_CEnumeration_CPnp_CIPnpObjectUpdate *updateInfo) 
+{
+    FIXME( "iface %p, updateInfo %p stub!\n", iface, updateInfo );
+    return E_NOTIMPL;
+}
+
+static const struct IPnpObjectVtbl pnpobj_vtbl =
+{
+    pnpobj_QueryInterface,
+    pnpobj_AddRef,
+    pnpobj_Release,
+    /* IInspectable methods */
+    pnpobj_GetIids,
+    pnpobj_GetRuntimeClassName,
+    pnpobj_GetTrustLevel,
+    /* IPnpObject methods */
+    pnpobj_get_Type,
+    pnpobj_get_Id,
+    pnpobj_get_Properties,
+    pnpobj_Update
+};
+
+static HRESULT create_from_id_async( IInspectable *invoker, IInspectable **result )
+{
+    struct pnpobj_impl *impl;
+    HRESULT hr;
+
+    FIXME("invoker %p, result %p semi-stub!\n", invoker, result);
+
+    if (!(impl = calloc(1, sizeof(*impl))))
+    {
+        *result = NULL;
+        return E_OUTOFMEMORY;
+    }
+
+    impl->IPnpObject_iface.lpVtbl = &pnpobj_vtbl;
+    impl->ref = 1;
+    hr = WindowsCreateString(NULL, 0, &impl->id);
+    if (hr != S_OK) {
+        free(impl);
+        ERR("WindowsCreateString failed\n");
+        return hr;
+    }
+
+    TRACE("created IPnpObject %p.\n", impl);
+    *result = (IInspectable*)&impl->IPnpObject_iface;
+    return S_OK;
+}
+
+static HRESULT find_all_async( IInspectable *invoker, IInspectable **result )
 {
     return E_NOTIMPL;
-    // struct motor *impl = impl_from_IForceFeedbackMotor( (IForceFeedbackMotor *)invoker );
-    // HRESULT hr;
-
-    // hr = IDirectInputDevice8_SendForceFeedbackCommand( impl->device, DISFFC_SETACTUATORSOFF );
-    // result->vt = VT_BOOL;
-    // result->boolVal = SUCCEEDED(hr);
-
-    // return hr;
 }
 
 static HRESULT WINAPI pnpstatic_CreateFromIdAsync( IPnpObjectStatics *iface, PnpObjectType type, HSTRING id, IIterable_HSTRING* requestedProperties, IAsyncOperation_PnpObject** asyncOp)
 {
-    FIXME( "iface %p, type %04x, id %s, requestedProperties %p, asyncOp %p stub!\n", iface, type, debugstr_hstring(id), requestedProperties, asyncOp );
-    return async_operation_pnpobject_create( (IUnknown *)iface, NULL, async_stub, asyncOp );
+    FIXME( "iface %p, type %04x, id %s, requestedProperties %p, asyncOp %p semi-stub!\n", iface, type, debugstr_hstring(id), requestedProperties, asyncOp );
+    return async_operation_inspectable_create(&IID_IAsyncOperation_PnpObject, NULL, create_from_id_async, (IAsyncOperation_IInspectable **)asyncOp);
 }
 
 static HRESULT WINAPI pnpstatic_FindAllAsync( IPnpObjectStatics *iface, PnpObjectType type, IIterable_HSTRING* requestedProperties, IAsyncOperation_PnpObjectCollection** asyncOp ) 
 {
     FIXME( "iface %p, type %04x, requestedProperties %p, asyncOp %p stub!\n", iface, type, requestedProperties, asyncOp );
-    return async_operation_pnpobjectcollection_create( (IUnknown *)iface, NULL, async_stub, asyncOp );
+    return async_operation_inspectable_create(&IID_IAsyncOperation_PnpObjectCollection, NULL, find_all_async, (IAsyncOperation_IInspectable **)asyncOp);
 }
 
 static HRESULT WINAPI pnpstatic_FindAllAsyncAqsFilter( IPnpObjectStatics *iface, PnpObjectType type, IIterable_HSTRING* requestedProperties, HSTRING aqsFilter, IAsyncOperation_PnpObjectCollection** asyncOp ) 
 {
     FIXME( "iface %p, type %04x, requestedProperties %p, aqsFilter %s, asyncOp %p stub!\n", iface, type, requestedProperties, debugstr_hstring(aqsFilter), asyncOp );
-    return async_operation_pnpobjectcollection_create( (IUnknown *)iface, NULL, async_stub, asyncOp );
+    //TODO: Filter not implemented
+    return async_operation_inspectable_create(&IID_IAsyncOperation_PnpObjectCollection, NULL, find_all_async, (IAsyncOperation_IInspectable **)asyncOp);
 }
 
 static HRESULT WINAPI pnpstatic_CreateWatcher( IPnpObjectStatics *iface, PnpObjectType type, IIterable_HSTRING* requestedProperties, __x_ABI_CWindows_CDevices_CEnumeration_CPnp_CIPnpObjectWatcher** watcher)

@@ -66,7 +66,7 @@ static HRESULT get_library_for_classid(const WCHAR *classid, WCHAR **out)
         return REGDB_E_READREGDB;
     if (RegOpenKeyExW(hkey_root, classid, 0, KEY_READ, &hkey_class))
     {
-        WARN("Class %s not found in registry\n", debugstr_w(classid));
+        ERR("Class %s not found in registry\n", debugstr_w(classid));
         RegCloseKey(hkey_root);
         return REGDB_E_CLASSNOTREG;
     }
@@ -75,11 +75,13 @@ static HRESULT get_library_for_classid(const WCHAR *classid, WCHAR **out)
     /* load (and expand) DllPath registry value */
     if (RegQueryValueExW(hkey_class, L"DllPath", NULL, &type, NULL, &size))
     {
+        ERR("DllPath not found\n");
         hr = REGDB_E_READREGDB;
         goto done;
     }
     if (type != REG_SZ && type != REG_EXPAND_SZ)
     {
+        ERR("DllPath wrong type\n");
         hr = REGDB_E_READREGDB;
         goto done;
     }
@@ -90,6 +92,7 @@ static HRESULT get_library_for_classid(const WCHAR *classid, WCHAR **out)
     }
     if (RegQueryValueExW(hkey_class, L"DllPath", NULL, NULL, (BYTE *)buf, &size))
     {
+        ERR("DllPath not found\n");
         hr = REGDB_E_READREGDB;
         goto done;
     }
@@ -106,6 +109,8 @@ static HRESULT get_library_for_classid(const WCHAR *classid, WCHAR **out)
         free(buf);
         buf = expanded;
     }
+
+    ERR("All is ok\n");
 
     *out = buf;
     return S_OK;
@@ -198,6 +203,16 @@ done:
     free(library);
     if (module) FreeLibrary(module);
     return hr;
+}
+
+/***********************************************************************
+ *      RoGetActivationFactory (combase.@)
+ */
+HRESULT WINAPI DECLSPEC_HOTPATCH RoGetAgileReference(LONG options, REFIID iid, IUnknown *unk, IAgileReference **agile_reference) 
+{
+    FIXME("options %#lx, iid %s, unk %p, agile_reference %p stub!\n", options, debugstr_guid(iid), unk, agile_reference);
+    if (agile_reference) *agile_reference = NULL;
+    return E_NOTIMPL;
 }
 
 /***********************************************************************
@@ -297,6 +312,16 @@ HRESULT WINAPI GetRestrictedErrorInfo(IRestrictedErrorInfo **info)
     FIXME( "(%p)\n", info );
     return E_NOTIMPL;
 }
+
+/***********************************************************************
+ *               SetRestrictedErrorInfo    (combase.@)
+ */
+HRESULT WINAPI SetRestrictedErrorInfo(IRestrictedErrorInfo *error_info)
+{
+    FIXME("error_info %p stub!\n", error_info);
+    return S_OK;
+}
+
 
 /***********************************************************************
  *      RoOriginateLanguageException (combase.@)

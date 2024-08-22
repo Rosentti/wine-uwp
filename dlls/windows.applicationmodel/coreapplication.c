@@ -22,13 +22,14 @@
 
 #include "wine/debug.h"
 
-WINE_DEFAULT_DEBUG_CHANNEL(appmodelcore);
+WINE_DEFAULT_DEBUG_CHANNEL(model);
 
 struct coreapp_impl
 {
     IActivationFactory IActivationFactory_iface;
     ICoreApplication ICoreApplication_iface;
     ICoreApplicationView ICoreApplicationView_iface;
+    ICoreWindow ICoreWindow_iface;
     IFrameworkView *current_view;
     LONG ref;
 };
@@ -221,7 +222,7 @@ static HRESULT WINAPI coreapp_impl_remove_Resuming( ICoreApplication *iface, Eve
     return E_NOTIMPL;
 }
 
-static HRESULT WINAPI coreapp_impl_get_Properties( ICoreApplication *iface, __x_ABI_CWindows_CFoundation_CCollections_CIPropertySet **value)
+static HRESULT WINAPI coreapp_impl_get_Properties( ICoreApplication *iface, IPropertySet **value)
 {
     FIXME("iface %p, value %p stub.\n", iface, value);
     return E_NOTIMPL;
@@ -237,6 +238,7 @@ static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewS
 {
     HRESULT ret;
     HSTRING handle;
+    ICoreWindow* wnd;
 
     struct coreapp_impl *impl = impl_from_ICoreApplication( iface );
 
@@ -257,7 +259,10 @@ static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewS
         return ret;
     }
 
+    impl->current_view->lpVtbl->SetWindow(impl->current_view, &impl->ICoreWindow_iface);
     impl->current_view->lpVtbl->Load(impl->current_view, handle);
+
+    //TODO: Run Activated handler
     impl->current_view->lpVtbl->Run(impl->current_view);
     return S_OK;
 }
@@ -399,11 +404,251 @@ static const struct ICoreApplicationViewVtbl coreappview_impl_vtbl =
     coreappview_impl_get_IsHosted
 };
 
+static inline struct coreapp_impl *impl_from_ICoreWindow( ICoreWindow *iface )
+{
+    return CONTAINING_RECORD( iface, struct coreapp_impl, ICoreWindow_iface );
+}
+
+static HRESULT WINAPI corewindow_impl_QueryInterface( ICoreWindow *iface, REFIID iid, void **out )
+{
+    struct coreapp_impl *impl = impl_from_ICoreWindow( iface );
+
+    TRACE( "iface %p, iid %s, out %p.\n", iface, debugstr_guid( iid ), out );
+
+    if (IsEqualGUID( iid, &IID_IUnknown ) ||
+        IsEqualGUID( iid, &IID_IInspectable ) ||
+        IsEqualGUID( iid, &IID_IAgileObject ) ||
+        IsEqualGUID( iid, &IID_ICoreWindow ))
+    {
+        *out = &impl->ICoreWindow_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    }
+
+    FIXME( "%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid( iid ) );
+    *out = NULL;
+    return E_NOINTERFACE;
+}
+
+static ULONG WINAPI corewindow_impl_AddRef( ICoreWindow *iface )
+{
+    struct coreapp_impl *impl = impl_from_ICoreWindow( iface );
+    ULONG ref = InterlockedIncrement( &impl->ref );
+    TRACE( "iface %p increasing refcount to %lu.\n", iface, ref );
+    return ref;
+}
+
+static ULONG WINAPI corewindow_impl_Release( ICoreWindow *iface )
+{
+    struct coreapp_impl *impl = impl_from_ICoreWindow( iface );
+    ULONG ref = InterlockedDecrement( &impl->ref );
+
+    TRACE( "iface %p decreasing refcount to %lu.\n", iface, ref );
+
+    if (!ref) free( impl );
+    return ref;
+}
+
+static HRESULT WINAPI corewindow_impl_GetIids( ICoreWindow *iface, ULONG *iid_count, IID **iids )
+{
+    FIXME( "iface %p, iid_count %p, iids %p stub!\n", iface, iid_count, iids );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_GetRuntimeClassName( ICoreWindow *iface, HSTRING *class_name )
+{
+    FIXME( "iface %p, class_name %p stub!\n", iface, class_name );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_GetTrustLevel( ICoreWindow *iface, TrustLevel *trust_level )
+{
+    FIXME( "iface %p, trust_level %p stub!\n", iface, trust_level );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_get_AutomationHostProvider( ICoreWindow *iface, IInspectable **value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_get_Bounds( ICoreWindow *iface, Rect *value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_get_CustomProperties( ICoreWindow *iface, IPropertySet **value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_get_Dispatcher( ICoreWindow *iface, ICoreDispatcher **value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_get_FlowDirection( ICoreWindow *iface, CoreWindowFlowDirection *value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    *value = CoreWindowFlowDirection_LeftToRight;
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_set_FlowDirection( ICoreWindow *iface, CoreWindowFlowDirection value )
+{
+    FIXME( "iface %p, value %d stub!\n", iface, value );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_get_IsInputEnabled( ICoreWindow *iface, boolean *value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    *value = TRUE;
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_set_IsInputEnabled( ICoreWindow *iface, boolean value )
+{
+    FIXME( "iface %p, value %d stub!\n", iface, value );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_get_PointerCursor( ICoreWindow *iface, ICoreCursor **value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_set_PointerCursor( ICoreWindow *iface, ICoreCursor* value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_get_PointerPosition( ICoreWindow *iface, Point* value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_get_Visible( ICoreWindow *iface, boolean* value )
+{
+    FIXME( "iface %p, value %p stub!\n", iface, value );
+    *value = TRUE;
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_Activate( ICoreWindow *iface )
+{
+    FIXME( "iface %p stub!\n", iface );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_Close( ICoreWindow *iface )
+{
+    FIXME( "iface %p stub!\n", iface );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_GetAsyncKeyState( ICoreWindow *iface, VirtualKey key, CoreVirtualKeyStates *state)
+{
+    FIXME( "iface %p stub!\n", iface );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_GetKeyState( ICoreWindow *iface, VirtualKey key, CoreVirtualKeyStates *state)
+{
+    FIXME( "iface %p stub!\n", iface );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow_impl_ReleasePointerCapture( ICoreWindow *iface )
+{
+    FIXME( "iface %p stub!\n", iface );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_impl_SetPointerCapture( ICoreWindow *iface )
+{
+    FIXME( "iface %p stub!\n", iface );
+    return S_OK;
+}
+
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, Activated, WindowActivatedEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, AutomationProviderRequested, AutomationProviderRequestedEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, CharacterReceived, CharacterReceivedEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, Closed, CoreWindowEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, InputEnabled, InputEnabledEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, KeyDown, KeyEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, KeyUp, KeyEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, PointerCaptureLost, PointerEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, PointerEntered, PointerEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, PointerExited, PointerEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, PointerMoved, PointerEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, PointerPressed, PointerEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, PointerReleased, PointerEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, TouchHitTesting, TouchHitTestingEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, PointerWheelChanged, PointerEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, SizeChanged, WindowSizeChangedEventArgs)
+DEFINE_EVENT_STUB(CoreWindow, corewindow_impl, VisibilityChanged, VisibilityChangedEventArgs)
+
+static const struct ICoreWindowVtbl corewindow_impl_vtbl =
+{
+    corewindow_impl_QueryInterface,
+    corewindow_impl_AddRef,
+    corewindow_impl_Release,
+    /* IInspectable methods */
+    corewindow_impl_GetIids,
+    corewindow_impl_GetRuntimeClassName,
+    corewindow_impl_GetTrustLevel,
+    /* ICoreWindow methods */
+    corewindow_impl_get_AutomationHostProvider,
+    corewindow_impl_get_Bounds,
+    corewindow_impl_get_CustomProperties,
+    corewindow_impl_get_Dispatcher,
+    corewindow_impl_get_FlowDirection,
+    corewindow_impl_set_FlowDirection,
+    corewindow_impl_get_IsInputEnabled,
+    corewindow_impl_set_IsInputEnabled,
+    corewindow_impl_get_PointerCursor,
+    corewindow_impl_set_PointerCursor,
+    corewindow_impl_get_PointerPosition,
+    corewindow_impl_get_Visible,
+    corewindow_impl_Activate,
+    corewindow_impl_Close,
+    corewindow_impl_GetAsyncKeyState,
+    corewindow_impl_GetKeyState,
+    corewindow_impl_ReleasePointerCapture,
+    corewindow_impl_SetPointerCapture,
+    DECLARE_EVENT(corewindow_impl, Activated),
+    DECLARE_EVENT(corewindow_impl, AutomationProviderRequested),
+    DECLARE_EVENT(corewindow_impl, CharacterReceived),
+    DECLARE_EVENT(corewindow_impl, Closed),
+    DECLARE_EVENT(corewindow_impl, InputEnabled),
+    DECLARE_EVENT(corewindow_impl, KeyDown),
+    DECLARE_EVENT(corewindow_impl, KeyUp),
+    DECLARE_EVENT(corewindow_impl, PointerCaptureLost),
+    DECLARE_EVENT(corewindow_impl, PointerEntered),
+    DECLARE_EVENT(corewindow_impl, PointerExited),
+    DECLARE_EVENT(corewindow_impl, PointerMoved),
+    DECLARE_EVENT(corewindow_impl, PointerPressed),
+    DECLARE_EVENT(corewindow_impl, PointerReleased),
+    DECLARE_EVENT(corewindow_impl, TouchHitTesting),
+    DECLARE_EVENT(corewindow_impl, PointerWheelChanged),
+    DECLARE_EVENT(corewindow_impl, SizeChanged),
+    DECLARE_EVENT(corewindow_impl, VisibilityChanged)
+};
+
 static struct coreapp_impl coreapp_impl_global =
 {
     .IActivationFactory_iface.lpVtbl = &factory_vtbl,
     .ICoreApplication_iface.lpVtbl = &coreapp_impl_vtbl,
     .ICoreApplicationView_iface.lpVtbl = &coreappview_impl_vtbl,
+    .ICoreWindow_iface.lpVtbl = &corewindow_impl_vtbl,
     .ref = 1,
 };
 
