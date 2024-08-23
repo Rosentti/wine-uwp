@@ -238,7 +238,6 @@ static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewS
 {
     HRESULT ret;
     HSTRING handle;
-    ICoreWindow* wnd;
 
     struct coreapp_impl *impl = impl_from_ICoreApplication( iface );
 
@@ -476,7 +475,11 @@ static HRESULT WINAPI corewindow_impl_get_AutomationHostProvider( ICoreWindow *i
 static HRESULT WINAPI corewindow_impl_get_Bounds( ICoreWindow *iface, Rect *value )
 {
     FIXME( "iface %p, value %p stub!\n", iface, value );
-    return E_NOTIMPL;
+    value->X = 0;
+    value->Y = 0;
+    value->Width = 1980;
+    value->Height = 1080;
+    return S_OK;
 }
 
 static HRESULT WINAPI corewindow_impl_get_CustomProperties( ICoreWindow *iface, IPropertySet **value )

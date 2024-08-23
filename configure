@@ -1494,6 +1494,7 @@ enable_windows_devices_usb
 enable_windows_gaming_input
 enable_windows_gaming_ui_gamebar
 enable_windows_globalization
+enable_windows_graphics_display
 enable_windows_media_devices
 enable_windows_media_mediacontrol
 enable_windows_media_speech
@@ -22770,6 +22771,7 @@ wine_fn_config_makefile dlls/windows.gaming.ui.gamebar enable_windows_gaming_ui_
 wine_fn_config_makefile dlls/windows.gaming.ui.gamebar/tests enable_tests
 wine_fn_config_makefile dlls/windows.globalization enable_windows_globalization
 wine_fn_config_makefile dlls/windows.globalization/tests enable_tests
+wine_fn_config_makefile dlls/windows.graphics.display enable_windows_graphics_display
 wine_fn_config_makefile dlls/windows.media.devices enable_windows_media_devices
 wine_fn_config_makefile dlls/windows.media.devices/tests enable_tests
 wine_fn_config_makefile dlls/windows.media.mediacontrol enable_windows_media_mediacontrol

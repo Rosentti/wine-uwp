@@ -62,6 +62,7 @@ namespace Windows.UI.Core {
     interface ICoreDispatcher;
     interface ICoreDispatcher2;
     interface ICoreDispatcherWithTaskPriority;
+    interface ICoreWindowInterop;
     interface ICoreWindow;
     interface ICoreWindow2;
     interface ICoreWindow3;
@@ -69,6 +70,7 @@ namespace Windows.UI.Core {
     interface ICoreWindow5;
     interface ICoreWindowEventArgs;
     interface ICoreWindowStatic;
+    interface ICoreWindowWithContext;
     interface IIdleDispatchedHandlerArgs;
     interface IInputEnabledEventArgs;
     interface IKeyEventArgs;
@@ -305,6 +307,16 @@ namespace Windows.UI.Core {
         HRESULT RunAsync([in] Windows.UI.Core.CoreDispatcherPriority priority, [in] Windows.UI.Core.DispatchedHandler *callback,
                          [out, retval] Windows.Foundation.IAsyncAction **action);
         HRESULT RunIdleAsync([in] Windows.UI.Core.IdleDispatchedHandler *callback, [out, retval] Windows.Foundation.IAsyncAction **action);
+    }
+
+    [
+        object, 
+        uuid(45d64a29-a63e-4cb6-b498-5781d298cb4f)
+    ]
+    interface ICoreWindowInterop : IUnknown
+    {
+        [propget] HRESULT WindowHandle([out, retval] HWND *hwnd);
+        [propput] HRESULT MessageHandled([in] boolean value);
     }
 
     [
@@ -591,8 +603,19 @@ namespace Windows.UI.Core {
     }
 
     [
+        contract(Windows.Foundation.UniversalApiContract, 8.0),
+        exclusiveto(Windows.UI.Core.CoreWindow),
+        uuid(9ac40241-3575-4c3b-af66-e8c529d4d06c)
+    ]
+    interface ICoreWindowWithContext : IInspectable
+    {
+        [propget] HRESULT UIContext([out] [retval] Windows.UI.UIContext** value);
+    }
+
+    [
         contract(Windows.Foundation.UniversalApiContract, 1.0),
         marshaling_behavior(standard),
+        threading(both),
         static(Windows.UI.Core.ICoreWindowStatic, Windows.Foundation.UniversalApiContract, 1.0)
     ]
     runtimeclass CoreWindow
