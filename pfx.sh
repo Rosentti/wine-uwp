@@ -13,7 +13,7 @@ export WINEPREFIX="$PWD/prefix"
 dxvk_lib32=${dxvk_lib32:-"x32"}
 dxvk_lib64=${dxvk_lib64:-"x64"}
 
-basedir="$PWD/build/dxvk/"
+basedir="$PWD/build/dxvk"
 
 file_cmd="cp -v --reflink=auto"
 
@@ -67,7 +67,7 @@ restoreDll() {
 # copy or link dxvk dll, back up original file
 installFile() {
   dstfile="${1}/${3}.dll"
-  srcfile="${basedir}/${2}/${3}.dll"
+  srcfile="${basedir}/${2}/bin/${3}.dll"
 
   if [ -f "${srcfile}.so" ]; then
     srcfile="${srcfile}.so"

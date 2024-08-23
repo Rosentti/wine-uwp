@@ -19,6 +19,7 @@
 
 #include "private.h"
 #include <assert.h>
+#include <winuser.h>
 
 #include "wine/debug.h"
 
@@ -30,7 +31,10 @@ struct coreapp_impl
     ICoreApplication ICoreApplication_iface;
     ICoreApplicationView ICoreApplicationView_iface;
     ICoreWindow ICoreWindow_iface;
+    ICoreWindowInterop ICoreWindowInterop_iface;
     IFrameworkView *current_view;
+    HWND window_handle;
+    HANDLE dispatcher_handle;
     LONG ref;
 };
 
@@ -234,10 +238,47 @@ static HRESULT WINAPI coreapp_impl_GetCurrentView( ICoreApplication *iface, ICor
     return E_NOTIMPL;
 }
 
+// this is the main message handler for the program
+static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    // sort through and find what code to run for the message given
+    switch(message)
+    {
+        // this message is read when the window is closed
+        case WM_DESTROY:
+            {
+                // close the application entirely
+                PostQuitMessage(0);
+                return 0;
+            } break;
+    }
+
+    // Handle any messages the switch statement didn't
+    return DefWindowProcW(hWnd, message, wParam, lParam);
+}
+
+static DWORD WINAPI DispatcherMain(void* data) {
+  MSG msg;
+
+  struct coreapp_impl *impl = data;
+
+  impl->window_handle = CreateWindowExW(WS_EX_APPWINDOW, L"UWPWindowClass", L"UWP Window", WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, NULL, NULL);
+  ShowWindow(impl->window_handle, SW_SHOW);
+
+  while(GetMessageW(&msg, NULL, 0, 0))
+  {
+    TranslateMessage(&msg);
+    DispatchMessageW(&msg);
+  }
+
+  return 0;
+}
+
 static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewSource *view_source)
 {
     HRESULT ret;
     HSTRING handle;
+    WNDCLASSEXW wc;
 
     struct coreapp_impl *impl = impl_from_ICoreApplication( iface );
 
@@ -258,6 +299,22 @@ static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewS
         return ret;
     }
 
+    ZeroMemory(&wc, sizeof(WNDCLASSEXW));
+
+    // fill in the struct with the needed information
+    wc.cbSize = sizeof(WNDCLASSEXW);
+    wc.style = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = NULL;
+    wc.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    wc.lpszClassName = L"UWPWindowClass";
+
+    // register the window class
+    RegisterClassExW(&wc);
+
+    impl->dispatcher_handle = CreateThread(NULL, 0, DispatcherMain, impl, 0, NULL);
+    
     impl->current_view->lpVtbl->SetWindow(impl->current_view, &impl->ICoreWindow_iface);
     impl->current_view->lpVtbl->Load(impl->current_view, handle);
 
@@ -291,6 +348,74 @@ static const struct ICoreApplicationVtbl coreapp_impl_vtbl =
     coreapp_impl_GetCurrentView,
     coreapp_impl_Run,
     coreapp_impl_RunWithActivationFactories
+};
+
+static inline struct coreapp_impl *impl_from_ICoreWindowInterop( ICoreWindowInterop *iface )
+{
+    return CONTAINING_RECORD( iface, struct coreapp_impl, ICoreWindowInterop_iface );
+}
+
+static HRESULT WINAPI corewindow_interop_impl_QueryInterface( ICoreWindowInterop *iface, REFIID iid, void **out )
+{
+    struct coreapp_impl *impl = impl_from_ICoreWindowInterop( iface );
+
+    TRACE( "iface %p, iid %s, out %p.\n", iface, debugstr_guid( iid ), out );
+
+    if (IsEqualGUID( iid, &IID_IUnknown ) ||
+        IsEqualGUID( iid, &IID_IInspectable ) ||
+        IsEqualGUID( iid, &IID_IAgileObject ) ||
+        IsEqualGUID( iid, &IID_ICoreWindowInterop ))
+    {
+        *out = &impl->ICoreWindowInterop_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    }
+
+    FIXME( "%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid( iid ) );
+    *out = NULL;
+    return E_NOINTERFACE;
+}
+
+static ULONG WINAPI corewindow_interop_impl_AddRef( ICoreWindowInterop *iface )
+{
+    struct coreapp_impl *impl = impl_from_ICoreWindowInterop( iface );
+    ULONG ref = InterlockedIncrement( &impl->ref );
+    TRACE( "iface %p increasing refcount to %lu.\n", iface, ref );
+    return ref;
+}
+
+static ULONG WINAPI corewindow_interop_impl_Release( ICoreWindowInterop *iface )
+{
+    struct coreapp_impl *impl = impl_from_ICoreWindowInterop( iface );
+    ULONG ref = InterlockedDecrement( &impl->ref );
+
+    TRACE( "iface %p decreasing refcount to %lu.\n", iface, ref );
+
+    if (!ref) free( impl );
+    return ref;
+}
+
+static HRESULT WINAPI corewindow_interop_impl_get_WindowHandle( ICoreWindowInterop *iface, HWND *value)
+{
+    struct coreapp_impl *impl = impl_from_ICoreWindowInterop( iface );
+    *value = impl->window_handle;
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow_interop_impl_set_MessageHandled( ICoreWindowInterop *iface, boolean value)
+{
+    FIXME("iface %p, value %d stub.\n", iface, value);
+    return S_OK;
+}
+
+static const struct ICoreWindowInteropVtbl corewindow_interop_impl_vtbl =
+{
+    corewindow_interop_impl_QueryInterface,
+    corewindow_interop_impl_AddRef,
+    corewindow_interop_impl_Release,
+    /* ICoreWindowInterop methods */
+    corewindow_interop_impl_get_WindowHandle,
+    corewindow_interop_impl_set_MessageHandled,
 };
 
 static inline struct coreapp_impl *impl_from_ICoreApplicationView( ICoreApplicationView *iface )
@@ -420,6 +545,13 @@ static HRESULT WINAPI corewindow_impl_QueryInterface( ICoreWindow *iface, REFIID
         IsEqualGUID( iid, &IID_ICoreWindow ))
     {
         *out = &impl->ICoreWindow_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    }
+
+    if (IsEqualGUID( iid, &IID_ICoreWindowInterop ))
+    {
+        *out = &impl->ICoreWindowInterop_iface;
         IInspectable_AddRef( *out );
         return S_OK;
     }
@@ -652,6 +784,7 @@ static struct coreapp_impl coreapp_impl_global =
     .ICoreApplication_iface.lpVtbl = &coreapp_impl_vtbl,
     .ICoreApplicationView_iface.lpVtbl = &coreappview_impl_vtbl,
     .ICoreWindow_iface.lpVtbl = &corewindow_impl_vtbl,
+    .ICoreWindowInterop_iface.lpVtbl = &corewindow_interop_impl_vtbl,
     .ref = 1,
 };
 

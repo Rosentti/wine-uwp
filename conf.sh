@@ -1,15 +1,19 @@
 #!/bin/bash
+rm -rf build/
+
 mkdir build
 mkdir build/32
 mkdir build/64
 mkdir build/dxvk
+mkdir build/dxvki
 mkdir build/dxvk/x64
 mkdir build/dxvk/x32
 
 DXVK_DIR="$PWD/build/dxvk/"
+DXVK_INTERMEDIATE_DIR="$PWD/build/dxvki/"
 cd dxvk-uwp
-meson setup --cross-file build-win64.txt --buildtype release --prefix "$DXVK_DIR/x64" build.w64
-meson setup --cross-file build-win32.txt --buildtype release --prefix "$DXVK_DIR/x32" build.w32
+meson setup --cross-file build-win64.txt --buildtype release --prefix "$DXVK_DIR/x64" "$DXVK_INTERMEDIATE_DIR/w64"
+meson setup --cross-file build-win32.txt --buildtype release --prefix "$DXVK_DIR/x32" "$DXVK_INTERMEDIATE_DIR/w32"
 cd ..
 
 cd build/64
