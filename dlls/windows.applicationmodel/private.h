@@ -42,6 +42,34 @@
 #include "windows.applicationmodel.core.h"
 #include "windows.applicationmodel.h"
 
+#include "wine/list.h"
+
+struct corewindow_impl {
+    ICoreWindow ICoreWindow_iface;
+    ICoreWindowInterop ICoreWindowInterop_iface;
+    HWND window_handle;
+    IFrameworkView *current_view;
+    struct dispatcher_impl *dispatcher;
+    LONG ref;
+};
+
+struct dispatcher_impl {
+    ICoreDispatcher ICoreDispatcher_iface;
+    HANDLE thread_handle;
+    struct corewindow_impl *for_window;
+    struct list queued_tasks;
+    BOOL window_created;
+    LONG ref;
+};
+
+extern struct corewindow_impl *create_corewindow(IFrameworkView *for_view);
+extern struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window);
+
+typedef HRESULT (*dispatcher_func)( IInspectable *invoker );
+
+extern void *dispatcher_run_and_wait(dispatcher_func func);
+extern void dispatcher_add_queue(dispatcher_func func);
+
 extern IActivationFactory *package_factory;
 extern IActivationFactory *coreapplication_factory;
 

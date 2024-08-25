@@ -1,8 +1,11 @@
 MODULE  = windows.applicationmodel.dll
-IMPORTS = combase kernelbase user32
+IMPORTS = $(XML2_PE_LIBS) combase kernelbase user32
+EXTRAINCL = $(XML2_PE_CFLAGS)
 
 SOURCES = \
 	classes.idl \
 	main.c \
 	coreapplication.c \
+	corewindow.c \
+	dispatcher.c \
 	package.c

@@ -2,17 +2,17 @@
 set -e
 
 # Begin with building dxvk-uwp
-cd dxvk-uwp/build.w64
+cd build/dxvki/w64
 ninja install
 cd ..
-cd build.w32
+cd w32
 ninja install
 cd ../..
 
-cd build/64
+cd "64"
 make -j24
-cd ../..
+cd ../
 
-cd build/32
+cd "32"
 make -j24
 cd ../..
