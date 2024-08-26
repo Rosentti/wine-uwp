@@ -181,11 +181,25 @@ static const struct ICoreDispatcherVtbl dispatcher_impl_vtbl =
     dispatcher_impl_RunIdleAsync,
 };
 
-struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window) {
+LPWSTR create_wide_string(char* regular_string) {
+    LPWSTR widestr;
+
+    int count = MultiByteToWideChar(CP_ACP, 0, regular_string, -1, NULL, 0);
+    widestr = calloc(1, count * sizeof(WCHAR) + 1);
+    MultiByteToWideChar(CP_ACP, 0, regular_string, -1, widestr, count);
+    return widestr;
+}
+
+struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window, char *identity_name, char *display_name) {
     struct dispatcher_impl *object;
     WNDCLASSEXW wc;
-
+    LPWSTR widentity_name;
+    LPWSTR wdisplay_name;
+    
     TRACE("for_view %p.\n", for_window);
+
+    widentity_name = create_wide_string(identity_name);
+    wdisplay_name = create_wide_string(display_name);
 
     if (!(object = calloc(1, sizeof(*object))))
         return NULL;
@@ -194,7 +208,7 @@ struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window) {
     object->ICoreDispatcher_iface.lpVtbl = &dispatcher_impl_vtbl;
     object->for_window = for_window;
     object->ref = 1;
-
+    
     
     ZeroMemory(&wc, sizeof(WNDCLASSEXW));
 
@@ -205,12 +219,12 @@ struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window) {
     wc.hInstance = NULL;
     wc.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
     wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-    wc.lpszClassName = L"UWPWindowClass";
+    wc.lpszClassName = widentity_name;
 
     // register the window class
     RegisterClassExW(&wc);
 
-    object->for_window->window_handle = CreateWindowExW(WS_EX_APPWINDOW, L"UWPWindowClass", L"UWP Window", WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, NULL, NULL);
+    object->for_window->window_handle = CreateWindowExW(WS_EX_APPWINDOW, widentity_name, wdisplay_name, WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, NULL, NULL);
     ShowWindow(object->for_window->window_handle, SW_SHOW);
 
     return object;

@@ -65,8 +65,8 @@ struct corewindow_tls {
     struct corewindow_impl *window;
 };
 
-extern struct corewindow_impl *create_corewindow(IFrameworkView *for_view);
-extern struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window);
+extern struct corewindow_impl *create_corewindow(IFrameworkView *for_view, char *identity_name, char *display_name);
+extern struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window, char *identity_name, char *display_name);
 
 typedef HRESULT (*dispatcher_func)( IInspectable *invoker );
 

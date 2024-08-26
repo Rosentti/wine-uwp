@@ -716,7 +716,7 @@ static const struct ICoreWindow4Vtbl corewindow4_impl_vtbl =
     corewindow4_impl_remove_ResizeCompleted
 };
 
-struct corewindow_impl *create_corewindow(IFrameworkView *for_view) {
+struct corewindow_impl *create_corewindow(IFrameworkView *for_view, char *identity_name, char *display_name) {
     struct corewindow_impl *object;
     struct corewindow_tls *tls;
 
@@ -731,7 +731,7 @@ struct corewindow_impl *create_corewindow(IFrameworkView *for_view) {
     object->current_view = for_view;
     object->current_view->lpVtbl->AddRef(object->current_view);
     object->ref = 1;
-    object->dispatcher = create_dispatcher(object);
+    object->dispatcher = create_dispatcher(object, identity_name, display_name);
 
     tls = LocalAlloc(LPTR, sizeof(*tls)); 
     tls->window = object;

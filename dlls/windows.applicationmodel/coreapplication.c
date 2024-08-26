@@ -38,6 +38,7 @@ struct coreapp_impl
     IFrameworkView *current_view;
     xmlDocPtr appx_manifest;
     char *display_name;
+    char *identity_name;
     LONG ref;
 };
 
@@ -249,9 +250,7 @@ static xmlNodePtr find_xml_child(xmlNodePtr node, const char* node_name) {
     }
 
     for (cur_node = node; cur_node; cur_node = cur_node->next) {
-        ERR("name: %s\n", cur_node->name);
-        if (strcmp((char*)cur_node->name, node_name) == 0) {
-            ERR("Found %s\n", cur_node->name);
+        if (xmlStrcmp(cur_node->name, (const xmlChar *)node_name) == 0) {
             return cur_node;
         }
     }
@@ -265,7 +264,8 @@ static BOOL try_parse_appxmanifest( struct coreapp_impl *impl )
     char *path;
     HRESULT ret;
     DWORD gmfl_ret;
-    xmlNodePtr element;
+    xmlNodePtr rootElem;
+    xmlNodePtr subElem;
 
     impl->appx_manifest = NULL;
 
@@ -310,24 +310,40 @@ static BOOL try_parse_appxmanifest( struct coreapp_impl *impl )
         return FALSE;
     }
 
-    element = xmlDocGetRootElement(impl->appx_manifest);
-    if (element == NULL) {
+    rootElem = xmlDocGetRootElement(impl->appx_manifest);
+    if (rootElem == NULL) {
         return FALSE;
     }
 
-    if (strcmp((char*)element->name, "Package") != 0) {
-        ERR("AppxManifest.xml: Invalid root key '%s', expected 'Package'\n", element->name);
+    if (strcmp((char*)rootElem->name, "Package") != 0) {
+        ERR("AppxManifest.xml: Invalid root key '%s', expected 'Package'\n", rootElem->name);
         return FALSE;
     }
 
-    element = find_xml_child(find_xml_child(element->children, "Properties")->children, "DisplayName");
-    if (element == NULL) {
+    subElem = find_xml_child(rootElem->children, "Properties");
+    if (subElem == NULL) {
+        ERR("AppxManifest.xml: No Properties defined!\n");
+        return FALSE;
+    }
+
+    subElem = find_xml_child(subElem->children, "DisplayName");
+    if (subElem == NULL) {
         ERR("AppxManifest.xml: No DisplayName defined!\n");
         return FALSE;
     }
 
-    impl->display_name = (char*)element->content;
-    ERR("Got display name %s\n", impl->display_name);
+    impl->display_name = (char*)subElem->children->content;
+    TRACE("Got display name %s\n", impl->display_name);
+
+    subElem = find_xml_child(rootElem->children, "Identity");
+    if (subElem == NULL) {
+        ERR("AppxManifest.xml: No Identity defined!\n");
+        return FALSE;
+    }
+
+    impl->identity_name = (char*)xmlGetProp(subElem, (const xmlChar *)"Name");
+    TRACE("Got identity name %s\n", impl->identity_name);
+
     return TRUE;
 }
 
@@ -363,7 +379,7 @@ static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewS
     // Initialize, Load, Run
     view->lpVtbl->Initialize(view, &impl->ICoreApplicationView_iface);
 
-    corewindow_impl = create_corewindow(view);
+    corewindow_impl = create_corewindow(view, impl->identity_name, impl->display_name);
     if (!corewindow_impl) {
         ERR("create_corewindow fail\n");
         return E_FAIL;

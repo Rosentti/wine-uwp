@@ -356,7 +356,7 @@ static HRESULT WINAPI displayinfo_get_LogicalDpi(
         IDisplayInformation *iface, FLOAT* value)
 {
     FIXME("iface %p, value %p stub!\n", iface, value);
-    *value = 1.0f;
+    *value = 96.0f;
     return S_OK;
 }
 
@@ -364,7 +364,7 @@ static HRESULT WINAPI displayinfo_get_RawDpiX(
         IDisplayInformation *iface, FLOAT* value)
 {
     FIXME("iface %p, value %p stub!\n", iface, value);
-    *value = 1.0f;
+    *value = 0.0f;
     return S_OK;
 }
 
@@ -372,7 +372,7 @@ static HRESULT WINAPI displayinfo_get_RawDpiY(
         IDisplayInformation *iface, FLOAT* value)
 {
     FIXME("iface %p, value %p stub!\n", iface, value);
-    *value = 1.0f;
+    *value = 0.0f;
     return S_OK;
 }
 
