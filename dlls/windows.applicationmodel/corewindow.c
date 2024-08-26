@@ -25,6 +25,214 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(model);
 
+struct corewindowstatics_impl {
+    IActivationFactory IActivationFactory_iface;
+    ICoreWindowStatic ICoreWindowStatic_iface;
+    LONG ref;
+};
+
+static inline struct corewindowstatics_impl *impl_from_IActivationFactory(IActivationFactory *iface)
+{
+    return CONTAINING_RECORD(iface, struct corewindowstatics_impl, IActivationFactory_iface);
+}
+
+static HRESULT WINAPI factory_QueryInterface(
+        IActivationFactory *iface, REFIID iid, void **out)
+{
+    struct corewindowstatics_impl *factory = impl_from_IActivationFactory(iface);
+
+    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+
+    if (IsEqualGUID(iid, &IID_IUnknown) ||
+        IsEqualGUID(iid, &IID_IInspectable) ||
+        IsEqualGUID(iid, &IID_IActivationFactory))
+    {
+        IUnknown_AddRef(iface);
+        *out = &factory->IActivationFactory_iface;
+        return S_OK;
+    }
+
+    if (IsEqualGUID(iid, &IID_ICoreWindowStatic))
+    {
+        IUnknown_AddRef(iface);
+        *out = &factory->ICoreWindowStatic_iface;
+        return S_OK;
+    }
+
+    FIXME("%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid(iid));
+    *out = NULL;
+    return E_NOINTERFACE;
+}
+
+static ULONG WINAPI factory_AddRef(IActivationFactory *iface)
+{
+    struct corewindowstatics_impl *factory = impl_from_IActivationFactory(iface);
+    ULONG refcount = InterlockedIncrement(&factory->ref);
+
+    TRACE("iface %p, refcount %lu.\n", iface, refcount);
+
+    return refcount;
+}
+
+static ULONG WINAPI factory_Release(IActivationFactory *iface)
+{
+    struct corewindowstatics_impl *factory = impl_from_IActivationFactory(iface);
+    ULONG refcount = InterlockedDecrement(&factory->ref);
+
+    TRACE("iface %p, refcount %lu.\n", iface, refcount);
+
+    return refcount;
+}
+
+static HRESULT WINAPI factory_GetIids(
+        IActivationFactory *iface, ULONG *iid_count, IID **iids)
+{
+    FIXME("iface %p, iid_count %p, iids %p stub!\n", iface, iid_count, iids);
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI factory_GetRuntimeClassName(
+        IActivationFactory *iface, HSTRING *class_name)
+{
+    FIXME("iface %p, class_name %p stub!\n", iface, class_name);
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI factory_GetTrustLevel(
+        IActivationFactory *iface, TrustLevel *trust_level)
+{
+    FIXME("iface %p, trust_level %p stub!\n", iface, trust_level);
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI factory_ActivateInstance(
+        IActivationFactory *iface, IInspectable **instance)
+{
+    FIXME("iface %p, instance %p stub!\n", iface, instance);
+    return E_NOTIMPL;
+}
+
+static const struct IActivationFactoryVtbl factory_vtbl =
+{
+    factory_QueryInterface,
+    factory_AddRef,
+    factory_Release,
+    /* IInspectable methods */
+    factory_GetIids,
+    factory_GetRuntimeClassName,
+    factory_GetTrustLevel,
+    /* IActivationFactory methods */
+    factory_ActivateInstance,
+};
+
+static inline struct corewindowstatics_impl *impl_from_ICoreWindowStatic(ICoreWindowStatic *iface)
+{
+    return CONTAINING_RECORD(iface, struct corewindowstatics_impl, ICoreWindowStatic_iface);
+}
+
+static HRESULT WINAPI corewindowstatic_QueryInterface(
+        ICoreWindowStatic *iface, REFIID iid, void **out)
+{
+    struct corewindowstatics_impl *factory = impl_from_ICoreWindowStatic(iface);
+
+    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+
+    if (IsEqualGUID(iid, &IID_IUnknown) ||
+        IsEqualGUID(iid, &IID_IInspectable) ||
+        IsEqualGUID(iid, &IID_ICoreWindowStatic))
+    {
+        IUnknown_AddRef(iface);
+        *out = &factory->ICoreWindowStatic_iface;
+        return S_OK;
+    }
+
+    FIXME("%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid(iid));
+    *out = NULL;
+    return E_NOINTERFACE;
+}
+
+static ULONG WINAPI corewindowstatic_AddRef(ICoreWindowStatic *iface)
+{
+    struct corewindowstatics_impl *factory = impl_from_ICoreWindowStatic(iface);
+    ULONG refcount = InterlockedIncrement(&factory->ref);
+
+    TRACE("iface %p, refcount %lu.\n", iface, refcount);
+
+    return refcount;
+}
+
+static ULONG WINAPI corewindowstatic_Release(ICoreWindowStatic *iface)
+{
+    struct corewindowstatics_impl *factory = impl_from_ICoreWindowStatic(iface);
+    ULONG refcount = InterlockedDecrement(&factory->ref);
+
+    TRACE("iface %p, refcount %lu.\n", iface, refcount);
+
+    return refcount;
+}
+
+static HRESULT WINAPI corewindowstatic_GetIids(
+        ICoreWindowStatic *iface, ULONG *iid_count, IID **iids)
+{
+    FIXME("iface %p, iid_count %p, iids %p stub!\n", iface, iid_count, iids);
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindowstatic_GetRuntimeClassName(
+        ICoreWindowStatic *iface, HSTRING *class_name)
+{
+    FIXME("iface %p, class_name %p stub!\n", iface, class_name);
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindowstatic_GetTrustLevel(
+        ICoreWindowStatic *iface, TrustLevel *trust_level)
+{
+    FIXME("iface %p, trust_level %p stub!\n", iface, trust_level);
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindowstatic_GetForCurrentThread(
+        ICoreWindowStatic *iface, ICoreWindow **windows)
+{
+    struct corewindow_tls *tls;
+    FIXME("iface %p, windows %p stub!\n", iface, windows);
+    tls = TlsGetValue(corewindow_tls); 
+    if ((tls == NULL) && (GetLastError() != ERROR_SUCCESS)) 
+    {
+        return E_FAIL;
+    }
+
+    *windows = &tls->window->ICoreWindow_iface;
+    if (*windows == NULL) {
+        return E_FAIL;
+    }
+    
+    return S_OK;
+}
+
+static const struct ICoreWindowStaticVtbl corewindowstatic_vtbl =
+{
+    corewindowstatic_QueryInterface,
+    corewindowstatic_AddRef,
+    corewindowstatic_Release,
+    /* IInspectable methods */
+    corewindowstatic_GetIids,
+    corewindowstatic_GetRuntimeClassName,
+    corewindowstatic_GetTrustLevel,
+    /* ICoreWindowStatic methods */
+    corewindowstatic_GetForCurrentThread,
+};
+
+static struct corewindowstatics_impl corewindowstatics_impl_global =
+{
+    .IActivationFactory_iface.lpVtbl = &factory_vtbl,
+    .ICoreWindowStatic_iface.lpVtbl = &corewindowstatic_vtbl,
+    .ref = 1,
+};
+
+IActivationFactory *corewindow_factory = &corewindowstatics_impl_global.IActivationFactory_iface;
+
 static inline struct corewindow_impl *impl_from_ICoreWindow(ICoreWindow *iface)
 {
     return CONTAINING_RECORD(iface, struct corewindow_impl, ICoreWindow_iface);
@@ -398,6 +606,7 @@ static const struct ICoreWindowVtbl corewindow_impl_vtbl =
 
 struct corewindow_impl *create_corewindow(IFrameworkView *for_view) {
     struct corewindow_impl *object;
+    struct corewindow_tls *tls;
 
     TRACE("for_view %p.\n", for_view);
 
@@ -410,6 +619,13 @@ struct corewindow_impl *create_corewindow(IFrameworkView *for_view) {
     object->current_view->lpVtbl->AddRef(object->current_view);
     object->ref = 1;
     object->dispatcher = create_dispatcher(object);
+
+    tls = LocalAlloc(LPTR, sizeof(*tls)); 
+    tls->window = object;
+    if (!TlsSetValue(corewindow_tls, (LPVOID)tls)) 
+    {
+        ERR("TlsSetValue failed!\n");
+    }
 
     return object;
 }

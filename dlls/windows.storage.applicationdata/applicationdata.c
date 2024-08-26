@@ -468,20 +468,23 @@ static HRESULT WINAPI application_data_ClearAsync( IApplicationData *iface, Appl
 
 static HRESULT WINAPI application_data_get_LocalSettings( IApplicationData *iface, IApplicationDataContainer **value )
 {
-    FIXME( "iface %p, value %p stub!\n", iface, value );
-    return E_NOTIMPL;
+    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
+    *value = create_data_container();
+    return S_OK;
 }
 
 static HRESULT WINAPI application_data_get_RoamingSettings( IApplicationData *iface, IApplicationDataContainer **value )
 {
-    FIXME( "iface %p, value %p stub!\n", iface, value );
-    return E_NOTIMPL;
+    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
+    *value = create_data_container();
+    return S_OK;
 }
 
 static HRESULT WINAPI application_data_get_LocalFolder( IApplicationData *iface, IStorageFolder **value )
 {
-    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
     struct storage_folder *impl;
+
+    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
 
     if (!value) return E_INVALIDARG;
     if (!(impl = calloc( 1, sizeof(*impl) ))) return E_OUTOFMEMORY;
@@ -497,8 +500,9 @@ static HRESULT WINAPI application_data_get_LocalFolder( IApplicationData *iface,
 
 static HRESULT WINAPI application_data_get_RoamingFolder( IApplicationData *iface, IStorageFolder **value )
 {
-    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
     struct storage_folder *impl;
+
+    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
 
     if (!value) return E_INVALIDARG;
     if (!(impl = calloc( 1, sizeof(*impl) ))) return E_OUTOFMEMORY;
@@ -514,8 +518,9 @@ static HRESULT WINAPI application_data_get_RoamingFolder( IApplicationData *ifac
 
 static HRESULT WINAPI application_data_get_TemporaryFolder( IApplicationData *iface, IStorageFolder **value )
 {
-    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
     struct storage_folder *impl;
+    
+    FIXME( "iface %p, value %p semi-stub!\n", iface, value );
 
     if (!value) return E_INVALIDARG;
     if (!(impl = calloc( 1, sizeof(*impl) ))) return E_OUTOFMEMORY;

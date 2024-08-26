@@ -216,23 +216,24 @@ static HRESULT WINAPI buffer_impl_GetTrustLevel( IBuffer *iface, TrustLevel *tru
 
 static HRESULT WINAPI buffer_impl_get_Capacity( IBuffer *iface, UINT32 *value)
 {
-    FIXME( "iface %p, value %p semi-stub!\n", iface, value);
     struct buffer_impl *impl = impl_from_IBuffer( iface );
+    FIXME( "iface %p, value %p semi-stub!\n", iface, value);
+   
     *value = impl->length;
     return S_OK;
 }
 
 static HRESULT WINAPI buffer_impl_get_Length( IBuffer *iface, UINT32 *value)
 {
-    FIXME( "iface %p, value %p semi-stub!\n", iface, value);
     struct buffer_impl *impl = impl_from_IBuffer( iface );
+    FIXME( "iface %p, value %p semi-stub!\n", iface, value);
     *value = impl->length;
     return S_OK;
 }
 
 static HRESULT WINAPI buffer_impl_set_Length( IBuffer *iface, UINT32 value)
 {
-    FIXME( "iface %p, value %p stub!\n", iface, value);
+    FIXME( "iface %p, value %u stub!\n", iface, value);
     // struct buffer_impl *impl = impl_from_IBuffer( iface );
     // *value = impl->length;
     return E_NOTIMPL;
@@ -271,14 +272,15 @@ static struct buffer_impl* alloc_buffer(UINT32 length) {
 static HRESULT STDMETHODCALLTYPE cryptobuffer_statics_GenerateRandom(
         ICryptographicBufferStatics *iface, UINT32 length, IBuffer **buffer)
 {
+    NTSTATUS ret;
+    struct buffer_impl* impl = alloc_buffer(length);
     FIXME("iface %p, length %u, buffer %p stub!\n", iface, length, buffer);
 
-    struct buffer_impl* impl = alloc_buffer(length);
     if (impl == NULL) {
         return E_OUTOFMEMORY;
     }
 
-    NTSTATUS ret = BCryptGenRandom(NULL, impl->dataptr, impl->length, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+    ret = BCryptGenRandom(NULL, impl->dataptr, impl->length, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
     if (ret != S_OK) {
         buffer_impl_Release(&impl->IBuffer_iface);
         return ret;
@@ -325,8 +327,10 @@ static HRESULT STDMETHODCALLTYPE cryptobuffer_statics_DecodeFromHexString(
 static HRESULT STDMETHODCALLTYPE cryptobuffer_statics_EncodeToHexString(
         ICryptographicBufferStatics *iface, IBuffer *buffer, HSTRING *value)
 {
+    HRESULT ret;
+
     FIXME("iface %p, buffer %p, value %p stub!\n", iface, buffer, value);
-    HRESULT ret = WindowsCreateString(NULL, 0, value);
+    ret = WindowsCreateString(NULL, 0, value);
     if (ret != S_OK) {
         return ret;
     }

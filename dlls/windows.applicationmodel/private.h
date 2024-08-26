@@ -62,6 +62,10 @@ struct dispatcher_impl {
     LONG ref;
 };
 
+struct corewindow_tls {
+    struct corewindow_impl *window;
+};
+
 extern struct corewindow_impl *create_corewindow(IFrameworkView *for_view);
 extern struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window);
 
@@ -70,8 +74,10 @@ typedef HRESULT (*dispatcher_func)( IInspectable *invoker );
 extern void *dispatcher_run_and_wait(dispatcher_func func);
 extern void dispatcher_add_queue(dispatcher_func func);
 
+extern DWORD corewindow_tls;
 extern IActivationFactory *package_factory;
 extern IActivationFactory *coreapplication_factory;
+extern IActivationFactory *corewindow_factory;
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \

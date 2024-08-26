@@ -31,6 +31,7 @@ import "windows.system.idl";
 #define DO_NO_IMPORTS
 #define _WINDOWS_APPLICATIONMODEL
 #define _WINDOWS_APPLICATIONMODEL_CORE
+#define _WINDOWS_UI_CORE
 #include "windows.applicationmodel.core.idl"
 #include "windows.applicationmodel.idl"
 #include "windows.applicationmodel.activation.idl"

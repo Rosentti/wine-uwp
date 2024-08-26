@@ -3,5 +3,7 @@ IMPORTS = combase kernelbase
 
 SOURCES = \
 	applicationdata.c \
+	applicationdatacontainer.c \
+	propertyset.c \
 	classes.idl \
 	main.c

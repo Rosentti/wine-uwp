@@ -281,6 +281,9 @@ static BOOL try_parse_appxmanifest( struct coreapp_impl *impl )
         return FALSE;
     }
 
+    // This shouldn't be here, but it's fine.
+    SetCurrentDirectoryW(wpath);
+
     ret = PathCchAppend(wpath, MAX_PATH, L"appxmanifest.xml");
     if (!SUCCEEDED(ret)) {
         ERR("PathCchAppend failed\n");
@@ -328,6 +331,8 @@ static BOOL try_parse_appxmanifest( struct coreapp_impl *impl )
     return TRUE;
 }
 
+DWORD corewindow_tls;
+
 static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewSource *view_source)
 {
     HRESULT ret;
@@ -337,6 +342,12 @@ static HRESULT WINAPI coreapp_impl_Run( ICoreApplication *iface, IFrameworkViewS
     struct coreapp_impl *impl = impl_from_ICoreApplication( iface );
     
     FIXME("iface %p, view_source %p semi-stub.\n", iface, view_source);
+
+    corewindow_tls = TlsAlloc();
+    if (corewindow_tls == TLS_OUT_OF_INDEXES) {
+        ERR("Failed to allocate TLS!\n");
+        return E_OUTOFMEMORY;
+    }
 
     if (!try_parse_appxmanifest(impl)) {
         ERR("Failed to parse AppxManifest.xml\n");

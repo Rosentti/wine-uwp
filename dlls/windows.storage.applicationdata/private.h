@@ -35,6 +35,8 @@
 #define WIDL_using_Windows_Storage
 #include "windows.storage.h"
 
+extern IPropertySet *create_propertyset(void);
+extern IApplicationDataContainer *create_data_container(void);
 extern IActivationFactory *application_data_factory;
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
