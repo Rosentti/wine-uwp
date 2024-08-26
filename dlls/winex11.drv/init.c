@@ -385,6 +385,7 @@ static const struct user_driver_funcs x11drv_funcs =
     .pToUnicodeEx = X11DRV_ToUnicodeEx,
     .pVkKeyScanEx = X11DRV_VkKeyScanEx,
     .pNotifyIMEStatus = X11DRV_NotifyIMEStatus,
+    .pSetIMECompositionWindowPos = X11DRV_SetIMECompositionWindowPos,
     .pDestroyCursorIcon = X11DRV_DestroyCursorIcon,
     .pSetCursor = X11DRV_SetCursor,
     .pGetCursorPos = X11DRV_GetCursorPos,
@@ -423,6 +424,7 @@ static const struct user_driver_funcs x11drv_funcs =
     .pUpdateLayeredWindow = X11DRV_UpdateLayeredWindow,
     .pWindowMessage = X11DRV_WindowMessage,
     .pWindowPosChanging = X11DRV_WindowPosChanging,
+    .pGetWindowStyleMasks = X11DRV_GetWindowStyleMasks,
     .pCreateWindowSurface = X11DRV_CreateWindowSurface,
     .pMoveWindowBits = X11DRV_MoveWindowBits,
     .pWindowPosChanged = X11DRV_WindowPosChanged,
@@ -430,7 +432,6 @@ static const struct user_driver_funcs x11drv_funcs =
     .pVulkanInit = X11DRV_VulkanInit,
     .pwine_get_wgl_driver = X11DRV_wine_get_wgl_driver,
     .pThreadDetach = X11DRV_ThreadDetach,
-    .pSetIMECompositionWindowPos = X11DRV_SetIMECompositionWindowPos,
 };
 
 

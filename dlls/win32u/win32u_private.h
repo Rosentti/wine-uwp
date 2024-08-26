@@ -41,7 +41,7 @@ extern void release_clipboard_owner( HWND hwnd );
 extern BOOL process_wine_setcursor( HWND hwnd, HWND window, HCURSOR handle );
 extern HICON alloc_cursoricon_handle( BOOL is_icon );
 extern ULONG_PTR get_icon_param( HICON handle );
-extern ULONG_PTR set_icon_param( HICON handle, ULONG_PTR param );
+extern ULONG_PTR set_icon_param( HICON handle, const struct free_icon_params *params );
 
 /* dce.c */
 extern struct window_surface dummy_surface;
@@ -158,7 +158,8 @@ extern void set_standard_scroll_painted( HWND hwnd, int bar, BOOL painted );
 extern void track_scroll_bar( HWND hwnd, int scrollbar, POINT pt );
 
 /* sysparams.c */
-extern BOOL enable_thunk_lock;
+extern BOOL decorated_mode;
+extern UINT64 thunk_lock_callback;
 extern HBRUSH get_55aa_brush(void);
 extern DWORD get_dialog_base_units(void);
 extern LONG get_char_dimensions( HDC hdc, TEXTMETRICW *metric, int *height );

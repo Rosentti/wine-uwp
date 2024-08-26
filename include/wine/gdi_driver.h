@@ -219,7 +219,7 @@ struct gdi_dc_funcs
 };
 
 /* increment this when you change the DC function table */
-#define WINE_GDI_DRIVER_VERSION 94
+#define WINE_GDI_DRIVER_VERSION 96
 
 #define GDI_PRIORITY_NULL_DRV        0  /* null driver */
 #define GDI_PRIORITY_FONT_DRV      100  /* any font driver */
@@ -340,6 +340,7 @@ struct user_driver_funcs
     /* IME functions */
     UINT    (*pImeProcessKey)(HIMC,UINT,UINT,const BYTE*);
     void    (*pNotifyIMEStatus)(HWND,UINT);
+    BOOL    (*pSetIMECompositionWindowPos)(HWND, const POINT *);
     /* cursor/icon functions */
     void    (*pDestroyCursorIcon)(HCURSOR);
     void    (*pSetCursor)(HWND,HCURSOR);
@@ -384,7 +385,8 @@ struct user_driver_funcs
     LRESULT (*pSysCommand)(HWND,WPARAM,LPARAM);
     void    (*pUpdateLayeredWindow)(HWND,UINT);
     LRESULT (*pWindowMessage)(HWND,UINT,WPARAM,LPARAM);
-    BOOL    (*pWindowPosChanging)(HWND,UINT,BOOL,struct window_rects *);
+    BOOL    (*pWindowPosChanging)(HWND,UINT,BOOL,const struct window_rects *);
+    BOOL    (*pGetWindowStyleMasks)(HWND,UINT,UINT,UINT*,UINT*);
     BOOL    (*pCreateWindowSurface)(HWND,BOOL,const RECT *,struct window_surface**);
     void    (*pMoveWindowBits)(HWND,const struct window_rects *,const RECT *);
     void    (*pWindowPosChanged)(HWND,HWND,UINT,const struct window_rects*,struct window_surface*);
@@ -396,8 +398,6 @@ struct user_driver_funcs
     struct opengl_funcs * (*pwine_get_wgl_driver)(UINT);
     /* thread management */
     void    (*pThreadDetach)(void);
-    /* IME support */
-    BOOL    (*pSetIMECompositionWindowPos)(HWND, const POINT *);
 };
 
 W32KAPI void __wine_set_user_driver( const struct user_driver_funcs *funcs, UINT version );

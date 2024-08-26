@@ -95,7 +95,7 @@ extern void ANDROID_SetParent( HWND hwnd, HWND parent, HWND old_parent );
 extern void ANDROID_SetCapture( HWND hwnd, UINT flags );
 extern UINT ANDROID_ShowWindow( HWND hwnd, INT cmd, RECT *rect, UINT swp );
 extern LRESULT ANDROID_WindowMessage( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp );
-extern BOOL ANDROID_WindowPosChanging( HWND hwnd, UINT swp_flags, BOOL shaped, struct window_rects *rects );
+extern BOOL ANDROID_WindowPosChanging( HWND hwnd, UINT swp_flags, BOOL shaped, const struct window_rects *rects );
 extern BOOL ANDROID_CreateWindowSurface( HWND hwnd, BOOL layered, const RECT *surface_rect, struct window_surface **surface );
 extern void ANDROID_WindowPosChanged( HWND hwnd, HWND insert_after, UINT swp_flags, const struct window_rects *new_rects,
                                       struct window_surface *surface );
@@ -107,6 +107,7 @@ extern NTSTATUS android_java_init( void *arg );
 extern NTSTATUS android_java_uninit( void *arg );
 extern NTSTATUS android_register_window( void *arg );
 extern PNTAPCFUNC register_window_callback;
+extern UINT64 start_device_callback;
 
 extern unsigned int screen_width;
 extern unsigned int screen_height;

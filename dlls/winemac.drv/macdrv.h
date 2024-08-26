@@ -43,7 +43,6 @@ extern BOOL skip_single_buffer_flushes;
 extern BOOL allow_vsync;
 extern BOOL allow_set_gamma;
 extern BOOL allow_software_rendering;
-extern BOOL disable_window_decorations;
 
 extern const char* debugstr_cf(CFTypeRef t);
 
@@ -147,7 +146,8 @@ extern UINT macdrv_ShowWindow(HWND hwnd, INT cmd, RECT *rect, UINT swp);
 extern LRESULT macdrv_SysCommand(HWND hwnd, WPARAM wparam, LPARAM lparam);
 extern void macdrv_UpdateLayeredWindow(HWND hwnd, UINT flags);
 extern LRESULT macdrv_WindowMessage(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp);
-extern BOOL macdrv_WindowPosChanging(HWND hwnd, UINT swp_flags, BOOL shaped, struct window_rects *rects);
+extern BOOL macdrv_WindowPosChanging(HWND hwnd, UINT swp_flags, BOOL shaped, const struct window_rects *rects);
+extern BOOL macdrv_GetWindowStyleMasks(HWND hwnd, UINT style, UINT ex_style, UINT *style_mask, UINT *ex_style_mask);
 extern BOOL macdrv_CreateWindowSurface(HWND hwnd, BOOL layered, const RECT *surface_rect, struct window_surface **surface);
 extern void macdrv_MoveWindowBits(HWND hwnd, const struct window_rects *new_rects, const RECT *valid_rects);
 extern void macdrv_WindowPosChanged(HWND hwnd, HWND insert_after, UINT swp_flags, const struct window_rects *new_rects,

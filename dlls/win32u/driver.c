@@ -686,6 +686,11 @@ static void nulldrv_NotifyIMEStatus( HWND hwnd, UINT status )
 {
 }
 
+static BOOL nulldrv_SetIMECompositionWindowPos( HWND hwnd, const POINT *point )
+{
+    return FALSE;
+}
+
 static LRESULT nulldrv_DesktopWindowProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam )
 {
     return default_window_proc( hwnd, msg, wparam, lparam, FALSE );
@@ -876,9 +881,14 @@ static LRESULT nulldrv_WindowMessage( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
     return 0;
 }
 
-static BOOL nulldrv_WindowPosChanging( HWND hwnd, UINT swp_flags, BOOL shaped, struct window_rects *rects )
+static BOOL nulldrv_WindowPosChanging( HWND hwnd, UINT swp_flags, BOOL shaped, const struct window_rects *rects )
 {
     return TRUE;
+}
+
+extern BOOL nulldrv_GetWindowStyleMasks( HWND hwnd, UINT style, UINT ex_style, UINT *style_mask, UINT *ex_style_mask )
+{
+    return FALSE;
 }
 
 static BOOL nulldrv_CreateWindowSurface( HWND hwnd, BOOL layered, const RECT *surface_rect, struct window_surface **surface )
@@ -912,11 +922,6 @@ static struct opengl_funcs *nulldrv_wine_get_wgl_driver( UINT version )
 
 static void nulldrv_ThreadDetach( void )
 {
-}
-
-static BOOL nulldrv_SetIMECompositionWindowPos( HWND hwnd, const POINT *point )
-{
-    return FALSE;
 }
 
 static const WCHAR guid_key_prefixW[] =
@@ -1099,6 +1104,11 @@ static void loaderdrv_NotifyIMEStatus( HWND hwnd, UINT status )
     return load_driver()->pNotifyIMEStatus( hwnd, status );
 }
 
+static BOOL loaderdrv_SetIMECompositionWindowPos( HWND hwnd, const POINT *point )
+{
+    return load_driver()->pSetIMECompositionWindowPos( hwnd, point );
+}
+
 static LONG loaderdrv_ChangeDisplaySettings( LPDEVMODEW displays, LPCWSTR primary_name, HWND hwnd,
                                              DWORD flags, LPVOID lparam )
 {
@@ -1243,6 +1253,7 @@ static const struct user_driver_funcs lazy_load_driver =
     loaderdrv_ReleaseKbdTables,
     loaderdrv_ImeProcessKey,
     loaderdrv_NotifyIMEStatus,
+    loaderdrv_SetIMECompositionWindowPos,
     /* cursor/icon functions */
     nulldrv_DestroyCursorIcon,
     loaderdrv_SetCursor,
@@ -1288,6 +1299,7 @@ static const struct user_driver_funcs lazy_load_driver =
     loaderdrv_UpdateLayeredWindow,
     nulldrv_WindowMessage,
     nulldrv_WindowPosChanging,
+    nulldrv_GetWindowStyleMasks,
     nulldrv_CreateWindowSurface,
     nulldrv_MoveWindowBits,
     nulldrv_WindowPosChanged,
@@ -1299,8 +1311,6 @@ static const struct user_driver_funcs lazy_load_driver =
     nulldrv_wine_get_wgl_driver,
     /* thread management */
     nulldrv_ThreadDetach,
-    /* IME support */
-    nulldrv_SetIMECompositionWindowPos,
 };
 
 const struct user_driver_funcs *user_driver = &lazy_load_driver;
@@ -1338,6 +1348,7 @@ void __wine_set_user_driver( const struct user_driver_funcs *funcs, UINT version
     SET_USER_FUNC(ReleaseKbdTables);
     SET_USER_FUNC(ImeProcessKey);
     SET_USER_FUNC(NotifyIMEStatus);
+    SET_USER_FUNC(SetIMECompositionWindowPos);
     SET_USER_FUNC(DestroyCursorIcon);
     SET_USER_FUNC(SetCursor);
     SET_USER_FUNC(GetCursorPos);
@@ -1378,6 +1389,7 @@ void __wine_set_user_driver( const struct user_driver_funcs *funcs, UINT version
     SET_USER_FUNC(UpdateLayeredWindow);
     SET_USER_FUNC(WindowMessage);
     SET_USER_FUNC(WindowPosChanging);
+    SET_USER_FUNC(GetWindowStyleMasks);
     SET_USER_FUNC(CreateWindowSurface);
     SET_USER_FUNC(MoveWindowBits);
     SET_USER_FUNC(WindowPosChanged);
@@ -1385,7 +1397,6 @@ void __wine_set_user_driver( const struct user_driver_funcs *funcs, UINT version
     SET_USER_FUNC(VulkanInit);
     SET_USER_FUNC(wine_get_wgl_driver);
     SET_USER_FUNC(ThreadDetach);
-    SET_USER_FUNC(SetIMECompositionWindowPos);
 #undef SET_USER_FUNC
 
     prev = InterlockedCompareExchangePointer( (void **)&user_driver, driver, (void *)&lazy_load_driver );
