@@ -42,7 +42,7 @@ static HRESULT WINAPI factory_QueryInterface(
 {
     struct displayinfo_impl *factory = impl_from_IActivationFactory(iface);
 
-    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+    TRACE("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||
@@ -136,7 +136,7 @@ static HRESULT WINAPI displayinfo_statics_QueryInterface(
 {
     struct displayinfo_impl *factory = impl_from_IDisplayInformationStatics(iface);
 
-    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+    TRACE("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||
@@ -258,7 +258,7 @@ static HRESULT WINAPI displayinfo_QueryInterface(
 {
     struct displayinfo_impl *factory = impl_from_IDisplayInformation(iface);
 
-    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+    TRACE("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||

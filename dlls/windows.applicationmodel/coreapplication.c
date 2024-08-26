@@ -51,7 +51,7 @@ static HRESULT WINAPI factory_QueryInterface(
 {
     struct coreapp_impl *factory = impl_from_IActivationFactory(iface);
 
-    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+    TRACE("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||
@@ -519,6 +519,8 @@ static const struct ICoreApplicationViewVtbl coreappview_impl_vtbl =
     coreappview_impl_get_IsMain,
     coreappview_impl_get_IsHosted
 };
+
+
 
 static struct coreapp_impl coreapp_impl_global =
 {

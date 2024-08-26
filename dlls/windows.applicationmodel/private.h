@@ -46,6 +46,7 @@
 
 struct corewindow_impl {
     ICoreWindow ICoreWindow_iface;
+    ICoreWindow4 ICoreWindow4_iface;
     ICoreWindowInterop ICoreWindowInterop_iface;
     HWND window_handle;
     IFrameworkView *current_view;
@@ -55,10 +56,8 @@ struct corewindow_impl {
 
 struct dispatcher_impl {
     ICoreDispatcher ICoreDispatcher_iface;
-    HANDLE thread_handle;
     struct corewindow_impl *for_window;
     struct list queued_tasks;
-    BOOL window_created;
     LONG ref;
 };
 
@@ -78,6 +77,7 @@ extern DWORD corewindow_tls;
 extern IActivationFactory *package_factory;
 extern IActivationFactory *coreapplication_factory;
 extern IActivationFactory *corewindow_factory;
+extern IActivationFactory *sysnav_factory;
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \

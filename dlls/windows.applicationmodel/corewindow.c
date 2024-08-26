@@ -41,7 +41,7 @@ static HRESULT WINAPI factory_QueryInterface(
 {
     struct corewindowstatics_impl *factory = impl_from_IActivationFactory(iface);
 
-    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+    TRACE("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||
@@ -135,7 +135,7 @@ static HRESULT WINAPI corewindowstatic_QueryInterface(
 {
     struct corewindowstatics_impl *factory = impl_from_ICoreWindowStatic(iface);
 
-    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+    TRACE("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||
@@ -196,15 +196,16 @@ static HRESULT WINAPI corewindowstatic_GetForCurrentThread(
         ICoreWindowStatic *iface, ICoreWindow **windows)
 {
     struct corewindow_tls *tls;
-    FIXME("iface %p, windows %p stub!\n", iface, windows);
     tls = TlsGetValue(corewindow_tls); 
     if ((tls == NULL) && (GetLastError() != ERROR_SUCCESS)) 
     {
+        ERR("TLS failed!\n");
         return E_FAIL;
     }
 
     *windows = &tls->window->ICoreWindow_iface;
     if (*windows == NULL) {
+        ERR("NULL window!\n");
         return E_FAIL;
     }
     
@@ -329,6 +330,13 @@ static HRESULT WINAPI corewindow_impl_QueryInterface( ICoreWindow *iface, REFIID
         return S_OK;
     }
 
+    if (IsEqualGUID( iid, &IID_ICoreWindow4 ))
+    {
+        *out = &impl->ICoreWindow4_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    }
+
     FIXME( "%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid( iid ) );
     *out = NULL;
     return E_NOINTERFACE;
@@ -404,8 +412,9 @@ static HRESULT WINAPI corewindow_impl_get_CustomProperties( ICoreWindow *iface, 
 
 static HRESULT WINAPI corewindow_impl_get_Dispatcher( ICoreWindow *iface, ICoreDispatcher **value )
 {
-    FIXME( "iface %p, value %p stub!\n", iface, value );
-    return E_NOTIMPL;
+    struct corewindow_impl *impl = impl_from_ICoreWindow( iface );
+    *value = &impl->dispatcher->ICoreDispatcher_iface;
+    return S_OK;
 }
 
 static HRESULT WINAPI corewindow_impl_get_FlowDirection( ICoreWindow *iface, CoreWindowFlowDirection *value )
@@ -604,6 +613,109 @@ static const struct ICoreWindowVtbl corewindow_impl_vtbl =
     DECLARE_EVENT(corewindow_impl, VisibilityChanged)
 };
 
+static inline struct corewindow_impl *impl_from_ICoreWindow4( ICoreWindow4 *iface )
+{
+    return CONTAINING_RECORD( iface, struct corewindow_impl, ICoreWindow4_iface );
+}
+
+static HRESULT WINAPI corewindow4_impl_QueryInterface( ICoreWindow4 *iface, REFIID iid, void **out )
+{
+    struct corewindow_impl *impl = impl_from_ICoreWindow4( iface );
+
+    TRACE( "iface %p, iid %s, out %p.\n", iface, debugstr_guid( iid ), out );
+
+    if (IsEqualGUID( iid, &IID_IUnknown ) ||
+        IsEqualGUID( iid, &IID_IInspectable ) ||
+        IsEqualGUID( iid, &IID_IAgileObject ) ||
+        IsEqualGUID( iid, &IID_ICoreWindow4 ))
+    {
+        *out = &impl->ICoreWindow4_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    }
+
+    FIXME( "%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid( iid ) );
+    *out = NULL;
+    return E_NOINTERFACE;
+}
+
+static ULONG WINAPI corewindow4_impl_AddRef( ICoreWindow4 *iface )
+{
+    struct corewindow_impl *impl = impl_from_ICoreWindow4( iface );
+    ULONG ref = InterlockedIncrement( &impl->ref );
+    TRACE( "iface %p increasing refcount to %lu.\n", iface, ref );
+    return ref;
+}
+
+static ULONG WINAPI corewindow4_impl_Release( ICoreWindow4 *iface )
+{
+    struct corewindow_impl *impl = impl_from_ICoreWindow4( iface );
+    ULONG ref = InterlockedDecrement( &impl->ref );
+
+    TRACE( "iface %p decreasing refcount to %lu.\n", iface, ref );
+
+    if (!ref) free( impl );
+    return ref;
+}
+
+static HRESULT WINAPI corewindow4_impl_GetIids( ICoreWindow4 *iface, ULONG *iid_count, IID **iids )
+{
+    FIXME( "iface %p, iid_count %p, iids %p stub!\n", iface, iid_count, iids );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow4_impl_GetRuntimeClassName( ICoreWindow4 *iface, HSTRING *class_name )
+{
+    FIXME( "iface %p, class_name %p stub!\n", iface, class_name );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow4_impl_GetTrustLevel( ICoreWindow4 *iface, TrustLevel *trust_level )
+{
+    FIXME( "iface %p, trust_level %p stub!\n", iface, trust_level );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI corewindow4_impl_add_ResizeStarted( ICoreWindow4 *iface, ITypedEventHandler_CoreWindow_IInspectable *handler, EventRegistrationToken *token )
+{
+    FIXME( "iface %p, handler %p, token %p stub!\n", iface, handler, token );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow4_impl_remove_ResizeStarted( ICoreWindow4 *iface, EventRegistrationToken token )
+{
+    FIXME("iface %p, token %#I64x stub.\n", iface, token.value);
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow4_impl_add_ResizeCompleted( ICoreWindow4 *iface, ITypedEventHandler_CoreWindow_IInspectable *handler, EventRegistrationToken *token )
+{
+    FIXME( "iface %p, handler %p, token %p stub!\n", iface, handler, token );
+    return S_OK;
+}
+
+static HRESULT WINAPI corewindow4_impl_remove_ResizeCompleted( ICoreWindow4 *iface, EventRegistrationToken token )
+{
+    FIXME("iface %p, token %#I64x stub.\n", iface, token.value);
+    return S_OK;
+}
+
+static const struct ICoreWindow4Vtbl corewindow4_impl_vtbl =
+{
+    corewindow4_impl_QueryInterface,
+    corewindow4_impl_AddRef,
+    corewindow4_impl_Release,
+    /* IInspectable methods */
+    corewindow4_impl_GetIids,
+    corewindow4_impl_GetRuntimeClassName,
+    corewindow4_impl_GetTrustLevel,
+    /* ICoreWindow4 methods */
+    corewindow4_impl_add_ResizeStarted,
+    corewindow4_impl_remove_ResizeStarted,
+    corewindow4_impl_add_ResizeCompleted,
+    corewindow4_impl_remove_ResizeCompleted
+};
+
 struct corewindow_impl *create_corewindow(IFrameworkView *for_view) {
     struct corewindow_impl *object;
     struct corewindow_tls *tls;
@@ -614,6 +726,7 @@ struct corewindow_impl *create_corewindow(IFrameworkView *for_view) {
         return NULL;
 
     object->ICoreWindow_iface.lpVtbl = &corewindow_impl_vtbl;
+    object->ICoreWindow4_iface.lpVtbl = &corewindow4_impl_vtbl;
     object->ICoreWindowInterop_iface.lpVtbl = &corewindow_interop_impl_vtbl;
     object->current_view = for_view;
     object->current_view->lpVtbl->AddRef(object->current_view);

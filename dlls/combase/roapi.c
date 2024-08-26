@@ -253,7 +253,7 @@ HRESULT WINAPI RoActivateInstance(HSTRING classid, IInspectable **instance)
  */
 HRESULT WINAPI RoGetApartmentIdentifier(UINT64 *identifier)
 {
-    FIXME("(%p): stub\n", identifier);
+    //FIXME("(%p): stub\n", identifier);
 
     if (!identifier)
         return E_INVALIDARG;

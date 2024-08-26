@@ -1,6 +1,6 @@
-/* WinRT Windows.UI Implementation
+/* WinRT Windows.Devices.Sensors implementation
  *
- * Copyright (C) 2023 Mohamad Al-Jaf
+ * Copyright 2024 Onni Kukkonen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,8 +17,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-#ifndef __WINE_WINDOWS_UI_PRIVATE_H
-#define __WINE_WINDOWS_UI_PRIVATE_H
+#ifndef __WINE_WINDOWS_DEVICES_SENSORS_PRIVATE_H
+#define __WINE_WINDOWS_DEVICES_SENSORS_PRIVATE_H
 
 #include <stdarg.h>
 
@@ -26,21 +26,26 @@
 #include "windef.h"
 #include "winbase.h"
 #include "winstring.h"
+#include "objbase.h"
 
 #include "activation.h"
 
 #define WIDL_using_Windows_Foundation
+#define WIDL_using_Windows_Foundation_Collections
 #include "windows.foundation.h"
-#define WIDL_using_Windows_UI_Input
-#define WIDL_using_Windows_UI
-#include "windows.ui.input.h"
-#include "windows.ui.h"
-#define WIDL_using_Windows_UI_ViewManagement
-#include "windows.ui.viewmanagement.h"
+#define WIDL_using_Windows_Devices_Sensors
+#include "windows.devices.sensors.h"
 
-extern IActivationFactory *uisettings_factory;
-extern IActivationFactory *inputpane_factory;
-extern IActivationFactory *ptrvissettings_factory;
+#include "wine/list.h"
+
+extern IActivationFactory *accelerometer_factory;
+
+typedef HRESULT (*async_action_callback)( IInspectable *invoker );
+typedef HRESULT (*async_operation_inspectable_callback)( IInspectable *invoker, IInspectable **result );
+
+HRESULT async_action_create( IInspectable *invoker, async_action_callback callback, IAsyncAction **out );
+HRESULT async_operation_inspectable_create( const GUID *iid, IInspectable *invoker, async_operation_inspectable_callback callback,
+                                            IAsyncOperation_IInspectable **out );                                                           
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \
@@ -79,5 +84,7 @@ extern IActivationFactory *ptrvissettings_factory;
     }
 #define DEFINE_IINSPECTABLE( pfx, iface_type, impl_type, base_iface )                              \
     DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, iface_type##_iface, &impl->base_iface )
+#define DEFINE_IINSPECTABLE_OUTER( pfx, iface_type, impl_type, outer_iface )                       \
+    DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, iface_type##_iface, impl->outer_iface )
 
 #endif

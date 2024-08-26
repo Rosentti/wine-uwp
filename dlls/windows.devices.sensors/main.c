@@ -1,6 +1,6 @@
-/* WinRT Windows.ApplicationModel Implementation
+/* WinRT Windows.Devices.Sensors implementation
  *
- * Copyright (C) 2023 Mohamad Al-Jaf
+ * Copyright 2024 Onni Kukkonen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 
 #include "wine/debug.h"
 
-WINE_DEFAULT_DEBUG_CHANNEL(model);
+WINE_DEFAULT_DEBUG_CHANNEL(sensors);
 
 HRESULT WINAPI DllGetClassObject( REFCLSID clsid, REFIID riid, void **out )
 {
@@ -38,17 +38,8 @@ HRESULT WINAPI DllGetActivationFactory( HSTRING classid, IActivationFactory **fa
 
     *factory = NULL;
 
-    if (!wcscmp( buffer, RuntimeClass_Windows_ApplicationModel_Package ))
-        IActivationFactory_QueryInterface( package_factory, &IID_IActivationFactory, (void **)factory );
-
-    if (!wcscmp( buffer, RuntimeClass_Windows_ApplicationModel_Core_CoreApplication ))
-        IActivationFactory_QueryInterface( coreapplication_factory, &IID_IActivationFactory, (void **)factory );
-
-    if (!wcscmp( buffer, RuntimeClass_Windows_UI_Core_CoreWindow ))
-        IActivationFactory_QueryInterface( corewindow_factory, &IID_IActivationFactory, (void **)factory );
-
-    if (!wcscmp( buffer, RuntimeClass_Windows_UI_Core_SystemNavigationManager ))
-        IActivationFactory_QueryInterface( sysnav_factory, &IID_IActivationFactory, (void **)factory );
+    if (!wcscmp( buffer, RuntimeClass_Windows_Devices_Sensors_Accelerometer ))
+        IActivationFactory_QueryInterface( accelerometer_factory, &IID_IActivationFactory, (void **)factory );
 
     if (*factory) return S_OK;
     return CLASS_E_CLASSNOTAVAILABLE;

@@ -107,25 +107,25 @@ static HRESULT WINAPI inputpane_GetTrustLevel( IInputPane *iface, TrustLevel *tr
 static HRESULT WINAPI inputpane_add_Showing( IInputPane *iface, ITypedEventHandler_InputPane_InputPaneVisibilityEventArgs *handler, EventRegistrationToken *token )
 {
     FIXME( "iface %p, handler %p, token %p stub!\n", iface, handler, token);
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 static HRESULT WINAPI inputpane_remove_Showing( IInputPane *iface, EventRegistrationToken token )
 {
     FIXME( "iface %p, token %#I64x stub!\n", iface, token.value );
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 static HRESULT WINAPI inputpane_add_Hiding( IInputPane *iface, ITypedEventHandler_InputPane_InputPaneVisibilityEventArgs *handler, EventRegistrationToken *token )
 {
     FIXME( "iface %p, handler %p, token %p stub!\n", iface, handler, token);
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 static HRESULT WINAPI inputpane_remove_Hiding( IInputPane *iface, EventRegistrationToken token )
 {
     FIXME( "iface %p, token %#I64x stub!\n", iface, token.value );
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 static HRESULT WINAPI inputpane_OccludedRect( IInputPane *iface, Rect *value )
@@ -188,6 +188,7 @@ struct inputpane_statics
 {
     IActivationFactory IActivationFactory_iface;
     IInputPaneInterop IInputPaneInterop_iface;
+    IInputPaneStatics IInputPaneStatics_iface;
     LONG ref;
 };
 
@@ -213,6 +214,12 @@ static HRESULT WINAPI factory_QueryInterface( IActivationFactory *iface, REFIID 
     else if (IsEqualGUID( iid, &IID_IInputPaneInterop ))
     {
         *out = &impl->IInputPaneInterop_iface;
+        IInspectable_AddRef( *out );
+        return S_OK;
+    } 
+    else if (IsEqualGUID( iid, &IID_IInputPaneStatics )) 
+    {
+        *out = &impl->IInputPaneStatics_iface;
         IInspectable_AddRef( *out );
         return S_OK;
     }
@@ -316,10 +323,38 @@ static const struct IInputPaneInteropVtbl inputpane_interop_vtbl =
     inputpane_interop_GetForWindow,
 };
 
+DEFINE_IINSPECTABLE( inputpanestatics, IInputPaneStatics, struct inputpane_statics, IActivationFactory_iface );
+
+static HRESULT WINAPI inputpanestatics_GetForCurrentView( IInputPaneStatics *iface, IInputPane **inputpane )
+{
+    struct inputpane_statics *impl = impl_from_IInputPaneStatics( iface );
+
+    TRACE( "(iface %p, inputpane %p)\n", iface, inputpane );
+
+    factory_ActivateInstance( &impl->IActivationFactory_iface, (IInspectable **)inputpane );
+    return S_OK;
+}
+
+static const struct IInputPaneStaticsVtbl inputpanestatics_vtbl =
+{
+    inputpanestatics_QueryInterface,
+    inputpanestatics_AddRef,
+    inputpanestatics_Release,
+
+    /* IInspectable methods */
+    inputpanestatics_GetIids,
+    inputpanestatics_GetRuntimeClassName,
+    inputpanestatics_GetTrustLevel,
+
+    /* IInputPaneStatics methods */
+    inputpanestatics_GetForCurrentView,
+};
+
 static struct inputpane_statics inputpane_statics =
 {
     {&factory_vtbl},
     {&inputpane_interop_vtbl},
+    {&inputpanestatics_vtbl},
     1,
 };
 

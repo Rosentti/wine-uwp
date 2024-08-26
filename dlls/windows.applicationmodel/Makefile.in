@@ -8,4 +8,5 @@ SOURCES = \
 	coreapplication.c \
 	corewindow.c \
 	dispatcher.c \
+	systemnavigationmanager.c \
 	package.c

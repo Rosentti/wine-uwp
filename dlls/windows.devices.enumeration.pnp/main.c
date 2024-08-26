@@ -313,7 +313,7 @@ static HRESULT WINAPI factory_QueryInterface(
 {
     struct pnpstatic *factory = impl_from_IActivationFactory(iface);
 
-    FIXME("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
+    TRACE("iface %p, iid %s, out %p.\n", iface, debugstr_guid(iid), out);
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||

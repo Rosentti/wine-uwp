@@ -835,6 +835,7 @@ SOURCES = \
 	windows.devices.bluetooth.idl \
 	windows.devices.enumeration.idl \
 	windows.devices.enumeration.pnp.idl \
+	windows.devices.sensors.idl \
 	windows.devices.geolocation.idl \
 	windows.devices.haptics.idl \
 	windows.devices.input.idl \

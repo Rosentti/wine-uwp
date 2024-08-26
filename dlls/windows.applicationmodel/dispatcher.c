@@ -51,24 +51,6 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
     return DefWindowProcW(hWnd, message, wParam, lParam);
 }
 
-static DWORD WINAPI DispatcherMain(void* data) {
-  MSG msg;
-
-  struct dispatcher_impl *impl = data;
-
-  impl->for_window->window_handle = CreateWindowExW(WS_EX_APPWINDOW, L"UWPWindowClass", L"UWP Window", WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, NULL, NULL);
-  impl->window_created = TRUE;
-  WakeByAddressSingle(&impl->window_created);
-
-  while(GetMessageW(&msg, NULL, 0, 0))
-  {
-    TranslateMessage(&msg);
-    DispatchMessageW(&msg);
-  }
-
-  return 0;
-}
-
 static inline struct dispatcher_impl *impl_from_ICoreDispatcher(ICoreDispatcher *iface)
 {
     return CONTAINING_RECORD(iface, struct dispatcher_impl, ICoreDispatcher_iface);
@@ -141,7 +123,32 @@ static HRESULT WINAPI dispatcher_impl_get_HasThreadAccess( ICoreDispatcher *ifac
 
 static HRESULT WINAPI dispatcher_impl_ProcessEvents( ICoreDispatcher *iface, CoreProcessEventsOption options)
 {
-    FIXME("iface %p, options %d stub.\n", iface, options);
+    MSG msg;
+    struct dispatcher_impl *impl = impl_from_ICoreDispatcher( iface );
+
+    if (options == CoreProcessEventsOption_ProcessUntilQuit) {
+        while(GetMessageW(&msg, impl->for_window->window_handle, 0, 0))
+        {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+    } else if (options == CoreProcessEventsOption_ProcessAllIfPresent) {
+        while(PeekMessageW(&msg, impl->for_window->window_handle, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+    } else if (options == CoreProcessEventsOption_ProcessOneIfPresent) {
+        PeekMessageW(&msg, impl->for_window->window_handle, 0, 0, PM_REMOVE);
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    } else if (options == CoreProcessEventsOption_ProcessOneAndAllPending) {
+        GetMessageW(&msg, impl->for_window->window_handle, 0, 0);
+        TranslateMessage(&msg);
+        DispatchMessageW(&msg);
+    } 
+    
+   
+
     return S_OK;
 }
 
@@ -174,8 +181,6 @@ static const struct ICoreDispatcherVtbl dispatcher_impl_vtbl =
     dispatcher_impl_RunIdleAsync,
 };
 
-static BOOL const_false = FALSE;
-
 struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window) {
     struct dispatcher_impl *object;
     WNDCLASSEXW wc;
@@ -205,13 +210,7 @@ struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window) {
     // register the window class
     RegisterClassExW(&wc);
 
-    object->thread_handle = CreateThread(NULL, 0, DispatcherMain, object, 0, NULL);
-
-    WaitOnAddress(&object->window_created, &const_false, sizeof(BOOL), INFINITE);
-    if (object->window_created != TRUE) {
-        ERR("Failed to create HWND!\n");
-    }
-
+    object->for_window->window_handle = CreateWindowExW(WS_EX_APPWINDOW, L"UWPWindowClass", L"UWP Window", WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, NULL, NULL);
     ShowWindow(object->for_window->window_handle, SW_SHOW);
 
     return object;

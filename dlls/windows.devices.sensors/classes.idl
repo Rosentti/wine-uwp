@@ -1,7 +1,7 @@
 /*
- * Runtime Classes for windows.applicationmodel.dll
+ * Runtime Classes for windows.devices.sensors.dll
  *
- * Copyright (C) 2023 Mohamad Al-Jaf
+ * Copyright 2024 Onni Kukkonen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,23 +19,4 @@
  */
 
 #pragma makedep register
-
-#ifdef __WIDL__
-#pragma winrt ns_prefix
-#endif
-
-import "windows.foundation.idl";
-import "windows.storage.idl";
-import "windows.system.idl";
-
-#define DO_NO_IMPORTS
-#define _WINDOWS_APPLICATIONMODEL
-#define _WINDOWS_APPLICATIONMODEL_CORE
-#include "windows.ui.idl"
-#include "windows.devices.input.idl"
-#include "windows.ui.input.idl"
-#include "windows.ui.core.idl"
-#include "windows.applicationmodel.core.idl"
-#include "windows.applicationmodel.idl"
-#include "windows.applicationmodel.activation.idl"
-#include "windows.applicationmodel.background.idl"
+#include "windows.devices.sensors.idl"
