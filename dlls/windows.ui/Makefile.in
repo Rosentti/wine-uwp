@@ -2,8 +2,10 @@ MODULE  = windows.ui.dll
 IMPORTS = combase advapi32
 
 SOURCES = \
+	async.c \
 	classes.idl \
 	inputpane.c \
+	jumplist.c \
 	main.c \
 	ptrvissettings.c \
 	uisettings.c
