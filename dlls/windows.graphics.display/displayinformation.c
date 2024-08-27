@@ -140,6 +140,7 @@ static HRESULT WINAPI displayinfo_statics_QueryInterface(
 
     if (IsEqualGUID(iid, &IID_IUnknown) ||
         IsEqualGUID(iid, &IID_IInspectable) ||
+        IsEqualGUID(iid, &IID_IAgileObject) ||
         IsEqualGUID(iid, &IID_IDisplayInformationStatics))
     {
         IUnknown_AddRef(iface);
