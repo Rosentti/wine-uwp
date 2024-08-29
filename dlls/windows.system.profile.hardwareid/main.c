@@ -185,8 +185,25 @@ static HRESULT WINAPI hardware_token_GetTrustLevel( IHardwareToken *iface, Trust
 }
 
 static HRESULT WINAPI hardware_token_get_Id( IHardwareToken *iface, IBuffer** value) {
+    struct buffer_impl *buf = alloc_buffer(12);
+
     FIXME("iface: %p, value: %p stub!\n", iface, value);
-    return E_NOTIMPL;
+    buf->dataptr[0] = '\1';
+    buf->dataptr[1] = '\0';
+    buf->dataptr[2] = '\4';
+    buf->dataptr[3] = '\0';
+
+    buf->dataptr[4] = '\5';
+    buf->dataptr[5] = '\0';
+    buf->dataptr[6] = '\1';
+    buf->dataptr[7] = '\2';
+    
+    buf->dataptr[8] = '\3';
+    buf->dataptr[9] = '\0';
+    buf->dataptr[10] = '\24';
+    buf->dataptr[11] = '\211';
+    *value = &buf->IBuffer_iface;
+    return S_OK;
 }
 
 static HRESULT WINAPI hardware_token_get_Signature( IHardwareToken *iface, IBuffer** value) {

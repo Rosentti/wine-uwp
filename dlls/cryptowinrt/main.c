@@ -144,137 +144,12 @@ static HRESULT STDMETHODCALLTYPE cryptobuffer_statics_Compare(
     return E_NOTIMPL;
 }
 
-struct buffer_impl
-{
-    IBuffer IBuffer_iface;
-    LONG ref;
-    UCHAR *dataptr;
-    UINT32 length;
-};
-
-static inline struct buffer_impl *impl_from_IBuffer( IBuffer *iface )
-{
-    return CONTAINING_RECORD( iface, struct buffer_impl, IBuffer_iface );
-}
-
-static HRESULT WINAPI buffer_impl_QueryInterface( IBuffer *iface, REFIID iid, void **out )
-{
-    struct buffer_impl *impl = impl_from_IBuffer( iface );
-
-    TRACE( "iface %p, iid %s, out %p.\n", iface, debugstr_guid( iid ), out );
-
-    if (IsEqualGUID( iid, &IID_IUnknown ) ||
-        IsEqualGUID( iid, &IID_IInspectable ) ||
-        IsEqualGUID( iid, &IID_IBuffer ))
-    {
-        *out = &impl->IBuffer_iface;
-        IInspectable_AddRef( *out );
-        return S_OK;
-    }
-
-    FIXME( "%s not implemented, returning E_NOINTERFACE.\n", debugstr_guid( iid ) );
-    *out = NULL;
-    return E_NOINTERFACE;
-}
-
-static ULONG WINAPI buffer_impl_AddRef( IBuffer *iface )
-{
-    struct buffer_impl *impl = impl_from_IBuffer( iface );
-    ULONG ref = InterlockedIncrement( &impl->ref );
-    TRACE( "iface %p increasing refcount to %lu.\n", iface, ref );
-    return ref;
-}
-
-static ULONG WINAPI buffer_impl_Release( IBuffer *iface )
-{
-    struct buffer_impl *impl = impl_from_IBuffer( iface );
-    ULONG ref = InterlockedDecrement( &impl->ref );
-
-    TRACE( "iface %p decreasing refcount to %lu.\n", iface, ref );
-
-    if (!ref) free( impl );
-    return ref;
-}
-
-static HRESULT WINAPI buffer_impl_GetIids( IBuffer *iface, ULONG *iid_count, IID **iids )
-{
-    FIXME( "iface %p, iid_count %p, iids %p stub!\n", iface, iid_count, iids );
-    return E_NOTIMPL;
-}
-
-static HRESULT WINAPI buffer_impl_GetRuntimeClassName( IBuffer *iface, HSTRING *class_name )
-{
-    FIXME( "iface %p, class_name %p stub!\n", iface, class_name );
-    return E_NOTIMPL;
-}
-
-static HRESULT WINAPI buffer_impl_GetTrustLevel( IBuffer *iface, TrustLevel *trust_level )
-{
-    FIXME( "iface %p, trust_level %p stub!\n", iface, trust_level );
-    return E_NOTIMPL;
-}
-
-static HRESULT WINAPI buffer_impl_get_Capacity( IBuffer *iface, UINT32 *value)
-{
-    struct buffer_impl *impl = impl_from_IBuffer( iface );
-    FIXME( "iface %p, value %p semi-stub!\n", iface, value);
-   
-    *value = impl->length;
-    return S_OK;
-}
-
-static HRESULT WINAPI buffer_impl_get_Length( IBuffer *iface, UINT32 *value)
-{
-    struct buffer_impl *impl = impl_from_IBuffer( iface );
-    FIXME( "iface %p, value %p semi-stub!\n", iface, value);
-    *value = impl->length;
-    return S_OK;
-}
-
-static HRESULT WINAPI buffer_impl_set_Length( IBuffer *iface, UINT32 value)
-{
-    FIXME( "iface %p, value %u stub!\n", iface, value);
-    // struct buffer_impl *impl = impl_from_IBuffer( iface );
-    // *value = impl->length;
-    return E_NOTIMPL;
-}
-
-static const struct IBufferVtbl buffer_vtbl =
-{
-    buffer_impl_QueryInterface,
-    buffer_impl_AddRef,
-    buffer_impl_Release,
-    /* IInspectable methods */
-    buffer_impl_GetIids,
-    buffer_impl_GetRuntimeClassName,
-    buffer_impl_GetTrustLevel,
-    /* IBuffer methods */
-    buffer_impl_get_Capacity,
-    buffer_impl_get_Length,
-    buffer_impl_set_Length,
-};
-
-static struct buffer_impl* alloc_buffer(UINT32 length) {
-    struct buffer_impl *impl;
-
-    if (length <= 0) return NULL;
-    if (!(impl = calloc( 1, sizeof(*impl) ))) return NULL;
-
-    impl->IBuffer_iface.lpVtbl = &buffer_vtbl;
-    impl->ref = 1;
-    impl->dataptr = calloc(1, length);
-    impl->length = length;
-
-    TRACE( "created IBuffer %p.\n", impl);
-    return impl;
-}
-
 static HRESULT STDMETHODCALLTYPE cryptobuffer_statics_GenerateRandom(
         ICryptographicBufferStatics *iface, UINT32 length, IBuffer **buffer)
 {
     NTSTATUS ret;
     struct buffer_impl* impl = alloc_buffer(length);
-    FIXME("iface %p, length %u, buffer %p stub!\n", iface, length, buffer);
+    TRACE("iface %p, length %u, buffer %p\n", iface, length, buffer);
 
     if (impl == NULL) {
         return E_OUTOFMEMORY;
@@ -282,7 +157,7 @@ static HRESULT STDMETHODCALLTYPE cryptobuffer_statics_GenerateRandom(
 
     ret = BCryptGenRandom(NULL, impl->dataptr, impl->length, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
     if (ret != S_OK) {
-        buffer_impl_Release(&impl->IBuffer_iface);
+        impl->IBuffer_iface.lpVtbl->Release(&impl->IBuffer_iface);
         return ret;
     }
 

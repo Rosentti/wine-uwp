@@ -110,8 +110,6 @@ static HRESULT get_library_for_classid(const WCHAR *classid, WCHAR **out)
         buf = expanded;
     }
 
-    ERR("All is ok\n");
-
     *out = buf;
     return S_OK;
 
@@ -210,9 +208,8 @@ done:
  */
 HRESULT WINAPI DECLSPEC_HOTPATCH RoGetAgileReference(LONG options, REFIID iid, IUnknown *unk, IAgileReference **agile_reference) 
 {
-    FIXME("options %#lx, iid %s, unk %p, agile_reference %p stub!\n", options, debugstr_guid(iid), unk, agile_reference);
-    if (agile_reference) *agile_reference = NULL;
-    return E_NOTIMPL;
+    FIXME("options %#lx, iid %s, unk %p, agile_reference %p semi-stub!\n", options, debugstr_guid(iid), unk, agile_reference);
+    return create_agile_reference(iid, unk, agile_reference);
 }
 
 /***********************************************************************
@@ -329,7 +326,8 @@ HRESULT WINAPI SetRestrictedErrorInfo(IRestrictedErrorInfo *error_info)
 BOOL WINAPI RoOriginateLanguageException(HRESULT error, HSTRING message, IUnknown *language_exception)
 {
     FIXME("%#lx, %s, %p: stub\n", error, debugstr_hstring(message), language_exception);
-    return FALSE;
+    RaiseException(error, 0, 0, NULL);
+    return TRUE;
 }
 
 /***********************************************************************

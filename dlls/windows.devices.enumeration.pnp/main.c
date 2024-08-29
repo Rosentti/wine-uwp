@@ -106,7 +106,52 @@ struct pnpobj_impl {
     PnpObjectType type;
     HSTRING id;
     IPnpObject IPnpObject_iface;
+    IMapView_HSTRING_IInspectable IMapView_iface;
     LONG ref;
+};
+
+DEFINE_IINSPECTABLE( mapview, IMapView_HSTRING_IInspectable, struct pnpobj_impl, IMapView_iface );
+
+static HRESULT WINAPI mapview_Lookup( IMapView_HSTRING_IInspectable *iface, HSTRING key, IInspectable **value)
+{
+    FIXME( "iface %p, key %s, value %p stub!\n", iface, debugstr_hstring(key), value );
+    return E_NOTIMPL;
+}
+
+static HRESULT WINAPI mapview_get_Size( IMapView_HSTRING_IInspectable *iface, unsigned int *size)
+{
+    FIXME( "iface %p, size %p stub!\n", iface, size );
+    *size = 0;
+    return S_OK;
+}
+
+static HRESULT WINAPI mapview_HasKey( IMapView_HSTRING_IInspectable *iface, HSTRING key, boolean *found)
+{
+    FIXME( "iface %p, key %s, found %p stub!\n", iface, debugstr_hstring(key), found );
+    *found = FALSE;
+    return S_OK;
+}
+
+static HRESULT WINAPI mapview_Split( IMapView_HSTRING_IInspectable *iface, IMapView_HSTRING_IInspectable **first, IMapView_HSTRING_IInspectable **second)
+{
+    FIXME( "iface %p, first %p, second %p stub!\n", iface, first, second );
+    return E_NOTIMPL;
+}
+
+static const struct IMapView_HSTRING_IInspectableVtbl mapview_vtbl =
+{
+    mapview_QueryInterface,
+    mapview_AddRef,
+    mapview_Release,
+    /* IInspectable methods */
+    mapview_GetIids,
+    mapview_GetRuntimeClassName,
+    mapview_GetTrustLevel,
+    /* IMapView_HSTRING_IInspectable methods */
+    mapview_Lookup,
+    mapview_get_Size,
+    mapview_HasKey,
+    mapview_Split
 };
 
 static inline struct pnpobj_impl *impl_from_IPnpObject( IPnpObject *iface )
@@ -195,8 +240,10 @@ static HRESULT WINAPI pnpobj_get_Id( IPnpObject *iface, HSTRING* value)
 
 static HRESULT WINAPI pnpobj_get_Properties( IPnpObject *iface, IMapView_HSTRING_IInspectable** value) 
 {
+    struct pnpobj_impl *impl = impl_from_IPnpObject( iface );
     FIXME( "iface %p, value %p stub!\n", iface, value );
-    return E_NOTIMPL;
+    *value = &impl->IMapView_iface;
+    return S_OK;
 }
 
 static HRESULT WINAPI pnpobj_Update( IPnpObject *iface, __x_ABI_CWindows_CDevices_CEnumeration_CPnp_CIPnpObjectUpdate *updateInfo) 
@@ -235,6 +282,7 @@ static HRESULT create_from_id_async( IInspectable *invoker, IInspectable **resul
     }
 
     impl->IPnpObject_iface.lpVtbl = &pnpobj_vtbl;
+    impl->IMapView_iface.lpVtbl = &mapview_vtbl;
     impl->ref = 1;
     hr = WindowsCreateString(NULL, 0, &impl->id);
     if (hr != S_OK) {
@@ -250,7 +298,16 @@ static HRESULT create_from_id_async( IInspectable *invoker, IInspectable **resul
 
 static HRESULT find_all_async( IInspectable *invoker, IInspectable **result )
 {
-    return E_NOTIMPL;
+    static const struct vector_iids iids =
+    {
+        .vector = &IID_IVector_PnpObject,
+        .view = &IID_IVectorView_PnpObject,
+        .iterable = &IID_IIterable_PnpObject,
+        .iterator = &IID_IIterator_PnpObject,
+    };
+
+    FIXME("invoker %p, result %p semi-stub!\n", invoker, result);
+    return vector_create( &iids, (void **)result );
 }
 
 static HRESULT WINAPI pnpstatic_CreateFromIdAsync( IPnpObjectStatics *iface, PnpObjectType type, HSTRING id, IIterable_HSTRING* requestedProperties, IAsyncOperation_PnpObject** asyncOp)

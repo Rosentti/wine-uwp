@@ -42,6 +42,15 @@
 
 extern IActivationFactory *activation_factory;
 
+struct vector_iids
+{
+    const GUID *vector;
+    const GUID *view;
+    const GUID *iterable;
+    const GUID *iterator;
+};
+extern HRESULT vector_create( const struct vector_iids *iids, void **out );
+
 typedef HRESULT (*async_action_callback)( IInspectable *invoker );
 typedef HRESULT (*async_operation_inspectable_callback)( IInspectable *invoker, IInspectable **result );
 
@@ -85,8 +94,8 @@ HRESULT async_operation_inspectable_create( const GUID *iid, IInspectable *invok
         return IInspectable_GetTrustLevel( (IInspectable *)(expr), trust_level );                  \
     }
 #define DEFINE_IINSPECTABLE( pfx, iface_type, impl_type, base_iface )                              \
-    DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, iface_type##_iface, &impl->base_iface )
+    DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, base_iface, &impl->base_iface )
 #define DEFINE_IINSPECTABLE_OUTER( pfx, iface_type, impl_type, outer_iface )                       \
-    DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, iface_type##_iface, impl->outer_iface )
+    DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from_##iface_type, outer_iface, impl->outer_iface )
 
 #endif

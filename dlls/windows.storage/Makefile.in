@@ -1,4 +1,4 @@
-MODULE  = windows.storage.applicationdata.dll
+MODULE  = windows.storage.dll
 IMPORTS = combase kernelbase
 
 SOURCES = \
@@ -6,4 +6,5 @@ SOURCES = \
 	applicationdatacontainer.c \
 	propertyset.c \
 	classes.idl \
+	datareader.c \
 	main.c

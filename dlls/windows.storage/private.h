@@ -33,11 +33,14 @@
 #define WIDL_using_Windows_Foundation_Collections
 #include "windows.foundation.h"
 #define WIDL_using_Windows_Storage
+#define WIDL_using_Windows_Storage_Streams
 #include "windows.storage.h"
+#include "windows.storage.streams.h"
 
 extern IPropertySet *create_propertyset(void);
 extern IApplicationDataContainer *create_data_container(void);
 extern IActivationFactory *application_data_factory;
+extern IActivationFactory *datareader_factory;
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \

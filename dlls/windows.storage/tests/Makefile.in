@@ -1,4 +1,4 @@
-TESTDLL = windows.storage.applicationdata.dll
+TESTDLL = windows.storage.dll
 IMPORTS = combase advapi32 shlwapi
 
 SOURCES = \

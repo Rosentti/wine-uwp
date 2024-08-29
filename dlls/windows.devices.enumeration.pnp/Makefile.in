@@ -4,4 +4,5 @@ IMPORTS = combase uuid
 SOURCES = \
 	async.c \
 	classes.idl \
+	vector.c \
 	main.c

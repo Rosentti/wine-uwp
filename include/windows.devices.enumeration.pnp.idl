@@ -43,6 +43,7 @@ namespace Windows.Devices.Enumeration.Pnp {
         interface Windows.Foundation.Collections.IIterable<Windows.Devices.Enumeration.Pnp.PnpObject*>;
         interface Windows.Foundation.Collections.IIterator<Windows.Devices.Enumeration.Pnp.PnpObject*>;
         interface Windows.Foundation.Collections.IVectorView<Windows.Devices.Enumeration.Pnp.PnpObject*>;
+        interface Windows.Foundation.Collections.IVector<Windows.Devices.Enumeration.Pnp.PnpObject*>;
 
         interface Windows.Foundation.AsyncOperationCompletedHandler<Windows.Devices.Enumeration.Pnp.PnpObject*>;
         interface Windows.Foundation.AsyncOperationCompletedHandler<Windows.Devices.Enumeration.Pnp.PnpObjectCollection*>;

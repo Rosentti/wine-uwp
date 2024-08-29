@@ -34,6 +34,17 @@
 
 #include "wbemcli.h"
 
+struct buffer_impl
+{
+    IBuffer IBuffer_iface;
+    IBufferByteAccess IBufferByteAccess_iface;
+    LONG ref;
+    UCHAR *dataptr;
+    UINT32 length;
+};
+
+extern struct buffer_impl* alloc_buffer(UINT32 length);
+
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \
     {                                                                                              \
