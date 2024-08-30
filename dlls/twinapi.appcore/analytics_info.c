@@ -239,8 +239,15 @@ static HRESULT WINAPI statics_get_VersionInfo( IAnalyticsInfoStatics *iface, IAn
 
 static HRESULT WINAPI statics_get_DeviceForm( IAnalyticsInfoStatics *iface, HSTRING *value )
 {
-    FIXME( "iface %p, value %p stub!\n", iface, value );
-    return E_NOTIMPL;
+    HRESULT ret;
+    TRACE( "iface %p, value %p\n", iface, value );
+    ret = WindowsCreateString( L"Desktop", wcslen( L"Desktop" ), value );
+    if (!SUCCEEDED(ret)) {
+        ERR("Failed WindowsCreateString!\n");
+        return ret;
+    }
+
+    return S_OK;
 }
 
 static const struct IAnalyticsInfoStaticsVtbl statics_vtbl =

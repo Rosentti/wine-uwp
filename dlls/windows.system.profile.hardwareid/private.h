@@ -30,7 +30,7 @@
 #define WIDL_using_Windows_Storage_Streams
 #include "windows.storage.streams.h"
 #define WIDL_using_Windows_System_Profile
-#include "windows.system.profile.h"
+#include "windows.system.profile.hardwareid.h"
 
 #include "wbemcli.h"
 

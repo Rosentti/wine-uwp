@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Rémi Bernon for CodeWeavers
+ * Copyright 2024 Onni Kukkonen
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,35 +31,43 @@ import "windows.system.idl";
 #endif
 
 namespace Windows.System.Profile {
+    interface IHardwareIdentificationStatics;
+    interface IHardwareToken;
 
-    interface IAnalyticsInfoStatics;
-    interface IAnalyticsInfoStatics2;
-    interface IAnalyticsVersionInfo;
-    interface IAnalyticsVersionInfo2;
-
-    runtimeclass AnalyticsVersionInfo;
-    runtimeclass AnalyticsInfo;
+    runtimeclass HardwareIdentification;
+    runtimeclass HardwareToken;
 
     [
         contract(Windows.Foundation.UniversalApiContract, 1.0),
-        exclusiveto(Windows.System.Profile.AnalyticsInfo),
-        uuid(1d5ee066-188d-5ba9-4387-acaeb0e7e305)
+        exclusiveto(Windows.System.Profile.HardwareIdentification),
+        uuid(971260e0-f170-4a42-bd55-a900b212dae2)
     ]
-    interface IAnalyticsInfoStatics : IInspectable
+    interface IHardwareIdentificationStatics : IInspectable
     {
-        [propget] HRESULT VersionInfo([out, retval] Windows.System.Profile.AnalyticsVersionInfo **value);
-        [propget] HRESULT DeviceForm([out, retval] HSTRING *value);
+        HRESULT GetPackageSpecificToken([in] Windows.Storage.Streams.IBuffer* nonce, [out, retval] Windows.System.Profile.HardwareToken** packageSpecificHardwareToken);
     }
 
     [
         contract(Windows.Foundation.UniversalApiContract, 1.0),
-        exclusiveto(Windows.System.Profile.AnalyticsVersionInfo),
-        uuid(926130b8-9955-4c74-bdc1-7cd0decf9b03)
+        exclusiveto(Windows.System.Profile.HardwareToken),
+        uuid(28f6d4c0-fb12-40a4-8167-7f4e03d2724c)
     ]
-    interface IAnalyticsVersionInfo : IInspectable
+    interface IHardwareToken : IInspectable
     {
-        [propget] HRESULT DeviceFamily([out, retval] HSTRING *value);
-        [propget] HRESULT DeviceFamilyVersion([out, retval] HSTRING *value);
+        [propget] HRESULT Id([out, retval] Windows.Storage.Streams.IBuffer** value);
+        [propget] HRESULT Signature([out, retval] Windows.Storage.Streams.IBuffer** value);
+        [propget] HRESULT Certificate([out, retval] Windows.Storage.Streams.IBuffer** value);
+    }
+
+    [
+        contract(Windows.Foundation.UniversalApiContract, 1.0),
+        marshaling_behavior(standard),  
+        static(Windows.System.Profile.IHardwareIdentificationStatics, Windows.Foundation.UniversalApiContract, 1.0),
+        threading(both)
+    ]
+    runtimeclass HardwareIdentification
+    {
+        [default] interface Windows.System.Profile.IHardwareIdentificationStatics;
     }
 
     [
@@ -67,20 +75,8 @@ namespace Windows.System.Profile {
         marshaling_behavior(agile),
         threading(both)
     ]
-    runtimeclass AnalyticsVersionInfo
+    runtimeclass HardwareToken
     {
-        [default] interface Windows.System.Profile.IAnalyticsVersionInfo;
-        [contract(Windows.Foundation.UniversalApiContract, 11.0)] interface Windows.System.Profile.IAnalyticsVersionInfo2;
-    }
-
-    [
-        contract(Windows.Foundation.UniversalApiContract, 1.0),
-        marshaling_behavior(agile),
-        static(Windows.System.Profile.IAnalyticsInfoStatics, Windows.Foundation.UniversalApiContract, 1.0),
-        static(Windows.System.Profile.IAnalyticsInfoStatics2, Windows.Foundation.UniversalApiContract, 6.0),
-        threading(both)
-    ]
-    runtimeclass AnalyticsInfo
-    {
+        [default] interface Windows.System.Profile.IHardwareToken;
     }
 }

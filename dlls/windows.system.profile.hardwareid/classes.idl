@@ -20,4 +20,4 @@
 
 #pragma makedep register
 
-#include "windows.system.profile.idl"
+#include "windows.system.profile.hardwareid.idl"
