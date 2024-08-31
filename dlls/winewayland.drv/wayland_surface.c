@@ -163,11 +163,13 @@ struct wayland_surface *wayland_surface_create(HWND hwnd)
     }
     wl_surface_set_user_data(surface->wl_surface, hwnd);
 
-    if (process_wayland.wp_viewporter)
+    surface->wp_viewport =
+        wp_viewporter_get_viewport(process_wayland.wp_viewporter,
+                                   surface->wl_surface);
+    if (!surface->wp_viewport)
     {
-        surface->wp_viewport =
-            wp_viewporter_get_viewport(process_wayland.wp_viewporter,
-                                       surface->wl_surface);
+        ERR("Failed to create wp_viewport Wayland surface\n");
+        goto err;
     }
 
     surface->window.scale = 1.0;
@@ -302,8 +304,8 @@ void wayland_surface_clear_role(struct wayland_surface *surface)
     wl_surface_attach(surface->wl_surface, NULL, 0, 0);
     wl_surface_commit(surface->wl_surface);
 
-    surface->buffer_width = 0;
-    surface->buffer_height = 0;
+    surface->content_width = 0;
+    surface->content_height = 0;
 
     wl_display_flush(process_wayland.wl_display);
 }
@@ -321,6 +323,7 @@ void wayland_surface_attach_shm(struct wayland_surface *surface,
                                 HRGN surface_damage_region)
 {
     RGNDATA *surface_damage;
+    int win_width, win_height;
 
     TRACE("surface=%p shm_buffer=%p (%dx%d)\n",
           surface, shm_buffer, shm_buffer->width, shm_buffer->height);
@@ -349,8 +352,22 @@ void wayland_surface_attach_shm(struct wayland_surface *surface,
         free(surface_damage);
     }
 
-    surface->buffer_width = shm_buffer->width;
-    surface->buffer_height = shm_buffer->height;
+    win_width = surface->window.rect.right - surface->window.rect.left;
+    win_height = surface->window.rect.bottom - surface->window.rect.top;
+
+    /* It is an error to specify a wp_viewporter source rectangle that
+     * is partially or completely outside of the wl_buffe.
+     * 0 is also an invalid width / height value so use 1x1 instead.
+     */
+    win_width = max(1, min(win_width, shm_buffer->width));
+    win_height = max(1, min(win_height, shm_buffer->height));
+
+    wp_viewport_set_source(surface->wp_viewport, 0, 0,
+                           wl_fixed_from_int(win_width),
+                           wl_fixed_from_int(win_height));
+
+    surface->content_width = win_width;
+    surface->content_height = win_height;
 }
 
 /**********************************************************************
@@ -474,13 +491,10 @@ static void wayland_surface_reconfigure_size(struct wayland_surface *surface,
 {
     TRACE("hwnd=%p size=%dx%d\n", surface->hwnd, width, height);
 
-    if (surface->wp_viewport)
-    {
-        if (width != 0 && height != 0)
-            wp_viewport_set_destination(surface->wp_viewport, width, height);
-        else
-            wp_viewport_set_destination(surface->wp_viewport, -1, -1);
-    }
+    if (width != 0 && height != 0)
+        wp_viewport_set_destination(surface->wp_viewport, width, height);
+    else
+        wp_viewport_set_destination(surface->wp_viewport, -1, -1);
 }
 
 /**********************************************************************
@@ -511,19 +525,11 @@ static void wayland_surface_reconfigure_client(struct wayland_surface *surface)
 
     wl_subsurface_set_position(surface->client->wl_subsurface, x, y);
 
-    if (surface->client->wp_viewport)
-    {
-        if (width != 0 && height != 0)
-        {
-            wp_viewport_set_destination(surface->client->wp_viewport,
-                                        width, height);
-        }
-        else
-        {
-            /* We can't have a 0x0 destination, use 1x1 instead. */
-            wp_viewport_set_destination(surface->client->wp_viewport, 1, 1);
-        }
-    }
+    if (width != 0 && height != 0)
+        wp_viewport_set_destination(surface->client->wp_viewport,
+                                    width, height);
+    else /* We can't have a 0x0 destination, use 1x1 instead. */
+        wp_viewport_set_destination(surface->client->wp_viewport, 1, 1);
 
     wl_surface_commit(surface->client->wl_surface);
 
@@ -823,11 +829,13 @@ struct wayland_client_surface *wayland_surface_get_client(struct wayland_surface
     /* Present contents independently of the parent surface. */
     wl_subsurface_set_desync(surface->client->wl_subsurface);
 
-    if (process_wayland.wp_viewporter)
+    surface->client->wp_viewport =
+        wp_viewporter_get_viewport(process_wayland.wp_viewporter,
+                                    surface->client->wl_surface);
+    if (!surface->client->wp_viewport)
     {
-        surface->client->wp_viewport =
-            wp_viewporter_get_viewport(process_wayland.wp_viewporter,
-                                        surface->client->wl_surface);
+        ERR("Failed to create client wp_viewport\n");
+        goto err;
     }
 
     wayland_surface_reconfigure_client(surface);
@@ -873,8 +881,8 @@ void wayland_surface_ensure_contents(struct wayland_surface *surface)
     width = surface->window.rect.right - surface->window.rect.left;
     height = surface->window.rect.bottom - surface->window.rect.top;
     needs_contents = surface->window.visible &&
-                     (surface->buffer_width != width ||
-                      surface->buffer_height != height);
+                     (surface->content_width != width ||
+                      surface->content_height != height);
 
     TRACE("surface=%p hwnd=%p needs_contents=%d\n",
           surface, surface->hwnd, needs_contents);
