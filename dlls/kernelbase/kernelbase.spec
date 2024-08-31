@@ -170,7 +170,13 @@
 @ stdcall CopyContext(ptr long ptr)
 @ stdcall CopyFile2(wstr wstr ptr)
 @ stdcall CopyFileExW(wstr wstr ptr ptr ptr long)
+@ stub CopyFileFromAppW
 @ stdcall CopyFileW(wstr wstr long)
+@ stub GetFileAttributesExFromAppW
+@ stub MoveFileFromAppW
+@ stub RemoveDirectoryFromAppW
+@ stub ReplaceFileFromAppW
+@ stub SetFileAttributesFromAppW
 @ stdcall -arch=x86_64 CopyMemoryNonTemporal(ptr ptr long) ntdll.RtlCopyMemoryNonTemporal
 @ stdcall CopySid(long ptr ptr)
 # @ stub CouldMultiUserAppsBehaviorBePossibleForPackage
@@ -180,6 +186,7 @@
 @ stdcall CreateConsoleScreenBuffer(long long ptr long ptr)
 @ stdcall CreateDirectoryA(str ptr)
 @ stdcall CreateDirectoryExW(wstr wstr ptr)
+@ stub CreateDirectoryFromAppW
 @ stdcall CreateDirectoryW(wstr ptr)
 # @ stub CreateEnclave
 @ stdcall CreateEventA(ptr long long str)
@@ -190,6 +197,8 @@
 @ stdcall CreateFiberEx(long long long ptr ptr)
 @ stdcall CreateFile2(wstr long long long ptr)
 @ stdcall CreateFileA(str long long ptr long long long)
+@ stub CreateFile2FromAppW
+@ stub CreateFileFromAppW
 @ stdcall CreateFileMappingFromApp(long ptr long int64 wstr)
 @ stdcall CreateFileMappingNumaW(long ptr long long long wstr long)
 @ stdcall CreateFileMappingW(long ptr long long long wstr)
@@ -255,6 +264,7 @@
 @ stdcall DeleteCriticalSection(ptr) ntdll.RtlDeleteCriticalSection
 @ stdcall DeleteFiber(ptr)
 @ stdcall DeleteFileA(str)
+@ stub DeleteFileFromAppW
 @ stdcall DeleteFileW(wstr)
 @ stdcall DeleteProcThreadAttributeList(ptr)
 # @ stub DeleteStateAtomValue
@@ -362,6 +372,7 @@
 @ stdcall FindFirstChangeNotificationW(wstr long long)
 @ stdcall FindFirstFileA(str ptr)
 @ stdcall FindFirstFileExA(str long ptr long ptr long)
+@ stub FindFirstFileExFromAppW
 @ stdcall FindFirstFileExW(wstr long ptr long ptr long)
 # @ stub FindFirstFileNameW
 @ stdcall FindFirstFileW(wstr ptr)

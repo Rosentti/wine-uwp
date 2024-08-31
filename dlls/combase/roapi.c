@@ -191,10 +191,15 @@ HRESULT WINAPI DECLSPEC_HOTPATCH RoGetActivationFactory(HSTRING classid, REFIID 
         hr = IActivationFactory_QueryInterface(factory, iid, class_factory);
         if (SUCCEEDED(hr))
         {
-            TRACE("Created interface %p\n", *class_factory);
+            ERR("Created interface %p\n", *class_factory);
             module = NULL;
+        } else {
+            ERR("Module %s QueryInterface failed!\n", debugstr_w(library));
         }
+
         IActivationFactory_Release(factory);
+    } else {
+        ERR("Module %s DllGetActivationFactory failed!\n", debugstr_w(library));
     }
 
 done:

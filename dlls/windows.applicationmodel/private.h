@@ -31,6 +31,7 @@
 
 #define WIDL_using_Windows_System
 #define WIDL_using_Windows_UI_Core
+#define WIDL_using_Windows_UI_Input
 #define WIDL_using_Windows_Foundation
 #define WIDL_using_Windows_Foundation_Collections
 #include "windows.ui.core.h"
@@ -67,6 +68,7 @@ struct corewindow_tls {
 
 extern struct corewindow_impl *create_corewindow(IFrameworkView *for_view, char *identity_name, char *display_name);
 extern struct dispatcher_impl *create_dispatcher(struct corewindow_impl *for_window, char *identity_name, char *display_name);
+extern ICoreCursor *create_cursor(UINT32 id, CoreCursorType type);    
 
 typedef HRESULT (*dispatcher_func)( IInspectable *invoker );
 
@@ -78,6 +80,8 @@ extern IActivationFactory *package_factory;
 extern IActivationFactory *coreapplication_factory;
 extern IActivationFactory *corewindow_factory;
 extern IActivationFactory *sysnav_factory;
+extern IActivationFactory *cursor_factory;
+extern IActivationFactory *ptrvissettings_factory;
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \

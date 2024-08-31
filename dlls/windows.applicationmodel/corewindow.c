@@ -23,7 +23,7 @@
 
 #include "wine/debug.h"
 
-WINE_DEFAULT_DEBUG_CHANNEL(model);
+WINE_DEFAULT_DEBUG_CHANNEL(corewnd);
 
 struct corewindowstatics_impl {
     IActivationFactory IActivationFactory_iface;

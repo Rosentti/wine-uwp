@@ -50,6 +50,14 @@ HRESULT WINAPI DllGetActivationFactory( HSTRING classid, IActivationFactory **fa
     if (!wcscmp( buffer, RuntimeClass_Windows_UI_Core_SystemNavigationManager ))
         IActivationFactory_QueryInterface( sysnav_factory, &IID_IActivationFactory, (void **)factory );
 
+    if (!wcscmp( buffer, RuntimeClass_Windows_UI_Core_CoreCursor ))
+        IActivationFactory_QueryInterface( cursor_factory, &IID_IActivationFactory, (void **)factory );
+
+    if (!wcscmp( buffer, RuntimeClass_Windows_UI_Input_PointerVisualizationSettings ))
+        IActivationFactory_QueryInterface( ptrvissettings_factory, &IID_IActivationFactory, (void **)factory );
+
     if (*factory) return S_OK;
+
+    FIXME("class %s not implemented!\n", debugstr_hstring(classid));
     return CLASS_E_CLASSNOTAVAILABLE;
 }

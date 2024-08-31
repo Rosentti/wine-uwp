@@ -23,7 +23,7 @@
 
 #include "wine/debug.h"
 
-WINE_DEFAULT_DEBUG_CHANNEL(model);
+WINE_DEFAULT_DEBUG_CHANNEL(dispatcher);
 
 struct dispatcher_queued_task {
     dispatcher_func func;

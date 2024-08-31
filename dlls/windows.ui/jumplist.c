@@ -1,4 +1,4 @@
-/* WinRT Windows.UI.Input.PointerVisualizationSettings Implementation
+/* WinRT Windows.UI.StartScreen.JumpList Implementation
  *
  * Copyright (C) 2024 Onni Kukkonen
  *

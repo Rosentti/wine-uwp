@@ -6,7 +6,9 @@ SOURCES = \
 	classes.idl \
 	main.c \
 	coreapplication.c \
+	corecursor.c \
 	corewindow.c \
 	dispatcher.c \
+	ptrvissettings.c \
 	systemnavigationmanager.c \
 	package.c

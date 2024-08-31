@@ -28,7 +28,7 @@
 
 #include "wine/debug.h"
 
-WINE_DEFAULT_DEBUG_CHANNEL(model);
+WINE_DEFAULT_DEBUG_CHANNEL(coreapp);
 
 struct coreapp_impl
 {

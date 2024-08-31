@@ -7,5 +7,4 @@ SOURCES = \
 	inputpane.c \
 	jumplist.c \
 	main.c \
-	ptrvissettings.c \
 	uisettings.c

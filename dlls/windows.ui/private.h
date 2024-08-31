@@ -42,7 +42,6 @@
 
 extern IActivationFactory *uisettings_factory;
 extern IActivationFactory *inputpane_factory;
-extern IActivationFactory *ptrvissettings_factory;
 extern IActivationFactory *jumplist_factory;
 
 typedef HRESULT (*async_action_callback)( IInspectable *invoker );
@@ -50,7 +49,7 @@ typedef HRESULT (*async_operation_inspectable_callback)( IInspectable *invoker, 
 
 HRESULT async_action_create( IInspectable *invoker, async_action_callback callback, IAsyncAction **out );
 HRESULT async_operation_inspectable_create( const GUID *iid, IInspectable *invoker, async_operation_inspectable_callback callback,
-                                            IAsyncOperation_IInspectable **out );                                                           
+                                            IAsyncOperation_IInspectable **out );                                                       
 
 #define DEFINE_IINSPECTABLE_( pfx, iface_type, impl_type, impl_from, iface_mem, expr )             \
     static inline impl_type *impl_from( iface_type *iface )                                        \

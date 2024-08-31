@@ -27,17 +27,23 @@ Also include the app's name, and what dependencies it has.
 
 ## TODO
 - Input (mouse and keyboard)
-- Controller support
-- Some other APIs
+- Most other APIs, new versioned APIs, etc
 
 ## Tested apps
 - Microsoft Mahjong
-  - Not working, would require XAML implementation
-- Marble Maze demo app
-  - Gets to main menu, however input is not currently supported.
-- Minecraft for Windows 10
-  - Mysterious page fault on read access to 0000000000000000
-- Asphalt 8
-  - `Windows.UI.StartScreen.JumpList` unimplemented
+  - Would require XAML implementation
 - Xbox App
   - Would require XAML implementation
+- Marble Maze demo app
+  - Works with Controller only.
+  - Crash on hitting targets, or the end of the level
+- Minecraft for Windows 10
+  - Hangs after AnalyticsInfo is retrieved and called:
+    ```
+    warn:heap:validate_used_block heap 00007FFFFE220000, ptr 00007FFFFF5DBCF0: block region not found.
+    err:heap:heap_validate heap 00007FFFFE220000: failed to to validate delayed free block 00007FFFFF5DBCE8
+    ```
+- Asphalt 8
+  - `Windows.Devices.Input.TouchCapabilities` unimplemented
+- RetroArch-UWP
+  - `ICoreApplication2` unimplemented

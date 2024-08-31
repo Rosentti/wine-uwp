@@ -199,7 +199,6 @@ static HRESULT WINAPI accelerometer_static_GetDefault(
 {
     struct accelerometer_impl *factory = impl_from_IAccelerometerStatics(iface);
     
-    FIXME("iface %p, result %p stub!\n", iface, result);
     *result = &factory->IAccelerometer_iface;
     return S_OK;
 }
