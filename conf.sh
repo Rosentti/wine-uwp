@@ -12,9 +12,9 @@ mkdir build/dxvk/x32
 ./conf_dxvk.sh
 
 cd build/64
-../../configure CC="ccache gcc" CROSSCC="ccache x86_64-w64-mingw32-gcc" --enable-win64
+../../configure CROSSDEBUG=pdb CC="ccache clang" --enable-win64 --with-mingw=clang
 cd ../..
 
 cd build/32
-PKG_CONFIG_PATH=/usr/lib32 ../../configure CC="ccache gcc" CROSSCC="ccache i686-w64-mingw32-gcc" --with-wine64=../64
+PKG_CONFIG_PATH=/usr/lib32 ../../configure CROSSDEBUG=pdb CC="ccache clang" --with-mingw=clang --with-wine64=../64
 cd ../..
